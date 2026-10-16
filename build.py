@@ -2,7 +2,8 @@
 import subprocess, pathlib, shutil
 root = pathlib.Path(__file__).resolve().parent
 (root/'build').mkdir(exist_ok=True); (root/'dist').mkdir(exist_ok=True)
-subprocess.run(['npx','tailwindcss','-c','tailwind.config.js','-i','src/tw.css','-o','build/tw.css','--minify'], cwd=root, check=True, capture_output=True)
+npx = shutil.which('npx') or 'npx'  # on Windows this resolves to npx.cmd
+subprocess.run([npx,'tailwindcss','-c','tailwind.config.js','-i','src/tw.css','-o','build/tw.css','--minify'], cwd=root, check=True, capture_output=True)
 css = (root/'build/tw.css').read_text()
 js = '\n'.join((root/f'src/app{i}.js').read_text() for i in range(1,5))
 (root/'build/app.js').write_text(js)
