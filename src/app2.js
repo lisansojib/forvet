@@ -455,36 +455,59 @@ function renderCommercialOutputs(calc) {
   $('commRetailSpreadLabel').textContent = fmtBDT(m.c.mrp - m.c.tp);
   $('commBonusDeductionLabel').textContent = `-${fmtBDT(m.bonusDil)}`;
   $('commCashDiscBdtLabel').textContent = `-${fmtBDT(m.cash)}`;
-  const row = (label, per, cls = '', bcls = '') => `<tr class="${cls}"><td class="py-1.5 px-3">${label}</td><td class="py-1.5 px-3 text-right mono ${bcls}">${fmtBDT(per)}</td><td class="py-1.5 px-3 text-right mono ${bcls}">${fmtBDT(per * y)}</td></tr>`;
+  // Statement rows: kind = line | less | subtotal | total. Deductions show a true minus sign, results are coloured by sign.
+  const money = v => (v < 0 ? '−' : '') + '৳' + Math.abs(Number(v) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const pctTP = v => m.c.tp > 0 ? `${fmtNum(v / m.c.tp * 100, 1)}%` : '—';
+  const signCls = v => v < 0 ? 'is-neg' : v > 0 ? 'is-pos' : '';
+  const row = (kind, label, per, detail = '', colour = false) => {
+    const c = colour ? signCls(per) : '';
+    return `<tr class="pl-${kind}"><td>${label}${detail ? `<span class="pl-detail">${detail}</span>` : ''}</td><td class="num ${c}">${money(per)}</td><td class="num ${c}">${money(per * y)}</td><td class="pct">${pctTP(per)}</td></tr>`;
+  };
+  $('plPackLabel').textContent = `· ${m.label} · ${fmtNum(y, 0)} packs`;
   $('waterfallStatementBody').innerHTML = [
-    row('Maximum Retail Price (MRP)', m.c.mrp, 'text-slate-600'),
-    row('<strong>Distributor Trade Price (TP)</strong>', m.c.tp, 'bg-emerald-50/40', 'font-bold'),
-    row(`Less: bonus dilution (${esc(bonusLabel(m.c))} → ${fmtNum(m.bonusFraction * 100, 2)}% of TP)`, -m.bonusDil, 'text-rose-700'),
-    row(`Less: cash discount (${fmtNum(m.c.cashDiscPct, 2)}% of TP)`, -m.cash, 'text-rose-700'),
-    row('Less: additional offer', -m.offer, 'text-rose-700'),
-    row('<strong>Net realized price (NRP)</strong>', m.nrp, 'bg-slate-100', 'font-bold text-indigo-900'),
-    row(`Less: finished COGS (bulk ${fmtBDT(m.bulkPerPack)} + packaging ${fmtBDT(m.packCost)})`, -m.cogs, 'text-slate-700'),
-    row('<strong>GROSS PROFIT (GP = NRP − COGS)</strong>', m.gp, 'bg-indigo-950 text-white', 'font-extrabold text-indigo-300'),
-    row(`Less: marketing (${fmtNum(e.marketing, 2)}% of GP)`, -m.mkt, 'text-amber-900'),
-    row(`Less: office (${fmtNum(e.office, 2)}% of GP)`, -m.office, 'text-amber-900'),
-    row(`Less: miscellaneous (${fmtNum(e.misc, 2)}% of GP)`, -m.misc, 'text-amber-900'),
-    row('<strong>NET PROFIT (NP = GP − expenses)</strong>', m.np, 'bg-emerald-900 text-white', 'font-extrabold text-emerald-300')
+    row('line', 'Maximum retail price (MRP)', m.c.mrp, `Retailer spread ${money(m.c.mrp - m.c.tp)}`),
+    row('subtotal', 'Trade price (TP)', m.c.tp),
+    row('less', 'Bonus dilution', -m.bonusDil, `${esc(bonusLabel(m.c))} · ${fmtNum(m.bonusFraction * 100, 2)}% of TP`),
+    row('less', 'Cash discount', -m.cash, `${fmtNum(m.c.cashDiscPct, 2)}% of TP`),
+    row('less', 'Additional offer', -m.offer),
+    row('subtotal', 'Net realized price (NRP)', m.nrp),
+    row('less', 'Finished COGS', -m.cogs, `Bulk ${money(m.bulkPerPack)} + packaging ${money(m.packCost)}`),
+    row('subtotal', 'Gross profit', m.gp, m.gpPct === null ? '' : `${fmtNum(m.gpPct, 1)}% of NRP`, true),
+    row('less', 'Marketing', -m.mkt, `${fmtNum(e.marketing, 2)}% of GP`),
+    row('less', 'Office', -m.office, `${fmtNum(e.office, 2)}% of GP`),
+    row('less', 'Miscellaneous', -m.misc, `${fmtNum(e.misc, 2)}% of GP`),
+    row('total', 'Net profit', m.np, m.npPct === null ? '' : `${fmtNum(m.npPct, 1)}% of NRP`, true)
   ].join('');
-  $('finalFinishedCogsPerPack').textContent = fmtBDT(m.cogs);
-  $('bulkCostPerPack').textContent = fmtBDT(m.bulkPerPack);
-  $('packCostPerUnit').textContent = fmtBDT(m.packCost);
-  $('netRealizedPricePerPack').textContent = fmtBDT(m.nrp);
+  const exp = m.mkt + m.office + m.misc;
+  $('finalFinishedCogsPerPack').textContent = money(m.cogs);
+  $('bulkCostPerPack').textContent = money(m.bulkPerPack);
+  $('packCostPerUnit').textContent = money(m.packCost);
+  $('netRealizedPricePerPack').textContent = money(m.nrp);
   $('packYieldCount').textContent = `${fmtNum(y, 0)} full packs${m.leftover > 0 ? ` · ${fmtNum(m.leftover, 4)} ${mu} left over` : ''}`;
-  $('gpPerPackBdt').textContent = `${fmtBDT(m.gp)} / pack`;
-  $('gpBatchTotalBdt').textContent = `Batch GP: ${fmtBDT(m.gp * y)}`;
-  $('gpMarginPctLabel').textContent = m.gpPct === null ? 'No margin: NRP ≤ 0' : `GP margin ${fmtNum(m.gpPct, 1)}% of NRP`;
-  $('expMktLabel').textContent = `Marketing (${fmtNum(e.marketing, 2)}% GP)`; $('expOfficeLabel').textContent = `Office (${fmtNum(e.office, 2)}% GP)`; $('expMiscLabel').textContent = `Misc. (${fmtNum(e.misc, 2)}% GP)`;
-  $('expMarketingPerPack').textContent = fmtBDT(m.mkt); $('expOfficePerPack').textContent = fmtBDT(m.office); $('expMiscPerPack').textContent = fmtBDT(m.misc);
-  $('npPerPackBdt').textContent = `${fmtBDT(m.np)} / pack`;
-  $('npBatchTotalBdt').textContent = `Batch NP: ${fmtBDT(m.np * y)}`;
-  $('npMarginSummaryLabel').textContent = m.npPct === null ? 'No margin: NRP ≤ 0' : `Net margin ${fmtNum(m.npPct, 1)}% of NRP`;
-  $('npBox').className = `${m.np < 0 ? 'bg-gradient-to-r from-rose-800 to-rose-900' : 'bg-gradient-to-r from-emerald-800 to-teal-900'} text-white p-4 rounded-xl shadow flex items-center justify-between gap-2`;
-  $('commercialFormulaNote').textContent = `How this is calculated: bonus dilution = TP × free ÷ (free + paid); cash discount = TP × %; NRP = TP − bonus − cash − offer; COGS = (raw materials + overhead) ÷ batch × pack size + packaging; GP = NRP − COGS; expenses are % of GP and only apply when GP is positive; NP = GP − expenses. Batch totals use ${fmtNum(y, 0)} full packs (rounded down).`;
+  $('gpPerPackBdt').textContent = money(m.gp); $('gpPerPackBdt').className = `pl-value mono ${signCls(m.gp)}`;
+  $('gpBatchTotalBdt').textContent = money(m.gp * y);
+  $('gpMarginPctLabel').textContent = m.gpPct === null ? 'No margin (NRP ≤ 0)' : `${fmtNum(m.gpPct, 1)}% margin`;
+  $('expTotalPerPack').textContent = money(exp);
+  $('expNote').textContent = m.gp > 0 ? `${fmtNum(e.marketing + e.office + e.misc, 1)}% of GP` : 'Not charged — GP is not positive';
+  $('expMktLabel').textContent = `Marketing · ${fmtNum(e.marketing, 2)}% of GP`; $('expOfficeLabel').textContent = `Office · ${fmtNum(e.office, 2)}% of GP`; $('expMiscLabel').textContent = `Miscellaneous · ${fmtNum(e.misc, 2)}% of GP`;
+  $('expMarketingPerPack').textContent = money(m.mkt); $('expOfficePerPack').textContent = money(m.office); $('expMiscPerPack').textContent = money(m.misc);
+  $('npPerPackBdt').textContent = money(m.np); $('npPerPackBdt').className = `pl-hero mono ${signCls(m.np)}`;
+  $('npBatchTotalBdt').textContent = money(m.np * y);
+  $('npMarginSummaryLabel').textContent = m.npPct === null ? 'No margin (NRP ≤ 0)' : `${fmtNum(m.npPct, 1)}% net margin`;
+  const chip = $('npStatusChip');
+  chip.className = `pl-chip ${m.np < 0 ? 'is-loss' : m.np > 0 ? 'is-profit' : 'is-even'}`;
+  chip.textContent = m.np < 0 ? 'Loss-making' : m.np > 0 ? 'Profitable' : 'Break-even';
+  // Cost-structure bar, scaled to whichever is larger: NRP or total cost. A loss shows as a red shortfall segment.
+  const cogsV = Math.max(m.cogs, 0), expV = Math.max(exp, 0), npV = m.np, nrpV = Math.max(m.nrp, 0);
+  const scale = Math.max(nrpV, cogsV + expV, 0.0001);
+  const segs = [['COGS', cogsV, '#67758d'], ['Expenses', expV, '#b1bac8']];
+  if (npV > 0) segs.push(['Net profit', npV, '#059669']); else if (npV < 0) segs.push(['Shortfall', -npV, '#dc2626']);
+  const nrpBase = nrpV > 0 ? nrpV : scale;
+  $('plBar').innerHTML = segs.filter(sg => sg[1] > 0).map(([l, v, col]) => `<span style="width:${(v / scale * 100).toFixed(2)}%;background:${col}" title="${l}: ${money(v)}"></span>`).join('');
+  $('plBar').setAttribute('aria-label', segs.map(([l, v]) => `${l} ${money(v)}`).join(', '));
+  $('plBarLegend').innerHTML = segs.map(([l, v, col]) => `<span><i class="pl-swatch" style="background:${col}"></i>${l} <span class="mono text-ink-800">${nrpV > 0 ? fmtNum(v / nrpBase * 100, 1) + '%' : money(v)}</span></span>`).join('');
+  $('plBarNote').textContent = npV < 0 && nrpV > 0 ? `costs are ${fmtNum((cogsV + expV) / nrpV * 100, 0)}% of NRP` : '';
+  $('commercialFormulaNote').textContent = `How this is calculated: bonus dilution = TP × free ÷ (free + paid); cash discount = TP × %; NRP = TP − bonus − cash − offer; COGS = (raw materials + overhead) ÷ batch × pack size + packaging; GP = NRP − COGS; expenses are % of GP and only apply when GP is positive; NP = GP − expenses. Batch totals use ${fmtNum(y, 0)} full packs (rounded down). “% of TP” compares each line with the trade price.`;
   $('costPackLabel').textContent = `${fmtNum(y, 0)} × ${m.label}`;
   $('costPackagingBatchSummary').textContent = fmtBDT(m.batchPackCost);
   $('costAllInWithPackBatch').textContent = fmtBDT(calc.bulk + m.batchPackCost);

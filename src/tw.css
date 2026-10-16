@@ -55,4 +55,43 @@
   .mnav-btn { @apply flex-1 flex flex-col items-center gap-0.5 rounded-md px-1 py-1.5 text-[11px] font-medium text-ink-500; }
   .mnav-btn svg { @apply w-5 h-5; }
   .mnav-btn.is-active { @apply text-brand-700 bg-brand-50; }
+
+  /* ---------- Profit & loss statement ---------- */
+  .pl-card { @apply bg-white rounded-xl border border-ink-200 shadow-sm; }
+  .pl-table { @apply text-left border-collapse text-[13px]; }
+  .pl-table thead th { @apply whitespace-nowrap px-4 py-2.5 bg-ink-50 border-b border-ink-200 text-[11px] font-semibold uppercase tracking-wider text-ink-500; }
+  .pl-table thead th:first-child { @apply rounded-tl-xl; }
+  .pl-table thead th:last-child { @apply rounded-tr-xl; }
+  .pl-table td { @apply px-4 py-[7px] align-baseline border-b border-ink-100; }
+  .pl-table td.num { @apply text-right font-mono whitespace-nowrap tabular-nums; }
+  .pl-table td.pct { @apply text-right font-mono whitespace-nowrap text-[11px] text-ink-400 tabular-nums; }
+  .pl-table .pl-detail { @apply ml-2 text-[11px] text-ink-400; }
+  .pl-line td { @apply text-ink-700; }
+  .pl-less td:first-child { @apply !pl-8 text-ink-600; }
+  .pl-less td.num { @apply text-ink-500; }
+  .pl-subtotal td { @apply bg-ink-50 font-semibold text-ink-900 border-t border-ink-200; }
+  .pl-subtotal td.pct { @apply font-normal; }
+  .pl-total td { @apply font-bold text-ink-950 text-[14px] border-t-2 border-ink-300 border-b-0 py-3; }
+  .pl-total td.pct { @apply font-normal text-[11px]; }
+  .pl-total td:first-child { @apply rounded-bl-xl; }
+  .pl-total td:last-child { @apply rounded-br-xl; }
+  .is-neg { @apply !text-red-600; }
+  .is-pos { @apply !text-emerald-700; }
+
+  .pl-kicker { @apply text-[11px] font-medium uppercase tracking-wider text-ink-500; }
+  .pl-hero { @apply text-[28px] leading-tight font-semibold tracking-tight text-ink-900 mt-1; }
+  .pl-tile { @apply bg-white rounded-xl border border-ink-200 shadow-sm p-3.5; }
+  .pl-value { @apply text-[18px] font-semibold text-ink-900 mt-1 tabular-nums; }
+  .pl-sub { @apply text-[11px] text-ink-500 mt-0.5; }
+  .pl-chip { @apply shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border; }
+  .pl-chip.is-loss { @apply bg-red-50 text-red-700 border-red-200; }
+  .pl-chip.is-profit { @apply bg-emerald-50 text-emerald-700 border-emerald-200; }
+  .pl-chip.is-even { @apply bg-ink-50 text-ink-600 border-ink-200; }
+  .pl-bar { @apply flex h-2.5 w-full rounded-full overflow-hidden bg-ink-100; }
+  .pl-bar > span { @apply h-full; }
+  .pl-bar > span + span { @apply border-l-2 border-white; }
+  .pl-swatch { @apply inline-block w-2 h-2 rounded-sm mr-1.5 align-middle; }
+  .pl-howto { @apply text-[11px] text-ink-500; }
+  .pl-howto summary { @apply cursor-pointer select-none text-ink-600 font-medium hover:text-ink-900 w-fit; }
+  .pl-howto p { @apply mt-1.5 leading-relaxed max-w-4xl; }
 }

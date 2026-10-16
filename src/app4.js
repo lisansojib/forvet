@@ -701,7 +701,7 @@ function wireEvents() {
   $('applyAllSwapsBtn').addEventListener('click', applyAllSwaps);
   $('analyzePreviewBtn').addEventListener('click', renderAnalyzePreview);
   $('analyzeGenerateBtn').addEventListener('click', analyzeGenerate);
-  window.addEventListener('beforeprint', () => { $('printDate').textContent = new Date().toLocaleString(); });
+  window.addEventListener('beforeprint', () => { $('printDate').textContent = new Date().toLocaleString(); qsa('details.pl-howto').forEach(d => { d.open = true; }); });
 }
 async function boot() {
   const source = loadLocal();
