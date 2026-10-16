@@ -11,4 +11,6 @@ html = head + (root/'src/body.html').read_text() + (root/'src/modals.html').read
 assert '</script' not in js.replace('<\\/script','')
 (root/'dist/index.html').write_text(html)
 shutil.copy(root/'config.js', root/'dist/config.js')
+for f in (root/'static').glob('*'):
+    shutil.copy(f, root/'dist'/f.name)  # e.g. _headers for Cloudflare Pages
 print('dist/index.html', len(html)//1024, 'KB; css', len(css)//1024, 'KB')

@@ -51,6 +51,29 @@ Anyone else (signed in or not) can only view. This is enforced by the database, 
 Any static host works: Cloudflare Pages, Netlify, GitHub Pages, or IIS / Kestrel static files.
 Upload `dist/index.html` and `dist/config.js` to the same folder. HTTPS is required for sign-in.
 
+## Deploy to Cloudflare Pages (free, works on mobile)
+One-time: create a free account at dash.cloudflare.com.
+
+**Option A — from your terminal (repeatable):**
+```
+npm install
+npm run deploy     # builds, then uploads dist/ to the "forvet" Pages project
+```
+The first run opens a browser to log in to Cloudflare and asks to create the `forvet` project
+(choose production branch `main`). The app is then live at **https://forvet.pages.dev**
+(or `forvet-xxxx.pages.dev` if the name is taken). Run `npm run deploy` again after each change.
+
+**Option B — no terminal:** Cloudflare dashboard → Workers & Pages → Create → Pages →
+*Upload assets* → name it `forvet` → drag the `dist` folder in → Deploy.
+
+Notes
+- `static/_headers` stops browsers caching `index.html` / `config.js`, so phones always get the latest version.
+- In local mode each phone/browser has its own data, starting from the samples. To see your
+  real formulations on the phone, either *Download backup* on the PC and *Restore* it on the phone,
+  or set up Supabase (section 2) so every device shares one database.
+- To keep it private, put Cloudflare Access (Zero Trust → Access → Applications, free up to 50 users)
+  in front of the site with an email one-time PIN.
+
 ## Moving from the old Forvet.html
 - **Same browser:** opening the new version imports the old saved data automatically. The old copy
   is left untouched.
