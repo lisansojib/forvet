@@ -220,12 +220,17 @@ function applyPermissions() {
 function renderModeButtons() {
   qsa('.mode-btn').forEach(b => {
     const on = b.dataset.mode === UI.mode;
-    b.classList.toggle('bg-emerald-500', on); b.classList.toggle('text-slate-950', on); b.classList.toggle('shadow', on);
-    b.classList.toggle('text-slate-300', !on);
+    b.classList.toggle('is-active', on && $('materialsView').hidden);
     b.setAttribute('aria-pressed', String(on));
   });
+  syncNavActive();
   const calcMode = UI.mode === 'calculate';
   $('formulateTop').hidden = calcMode; $('formulateLower').hidden = calcMode;
+}
+function syncNavActive() {
+  const mat = !$('materialsView').hidden;
+  qsa('[data-nav=materials]').forEach(b => { b.classList.toggle('is-active', mat); b.setAttribute('aria-current', mat ? 'page' : 'false'); });
+  if (mat) qsa('.mode-btn').forEach(b => b.classList.remove('is-active'));
 }
 function productOptionsHtml(selectedId) {
   const list = activeFormulations();
@@ -337,7 +342,7 @@ function renderCosting(calc) {
   $('costWarnings').innerHTML = warningsHtml(calc.warnings.filter(w => /rate|missing|Q\.S\. carrier material/i.test(w.text)));
   const f = calc.f; let n = 0;
   if (canEdit()) for (const l of calc.lines) if (l.complete && !l.isQs && l.role !== CARRIER_ROLE && findAlternative(l.ing, f.intention)) n++;
-  $('swapBadgeCount').textContent = n;
+  $('swapBadgeCount').textContent = n; $('swapBadgeCount').hidden = !n;
   $('costSavingsCallout').innerHTML = n ? `<div class="flex items-center justify-between gap-2"><span><strong>${n}</strong> ${esc(f.intention)} swap suggestion(s).</span><button type="button" data-act="optimizer" class="admin-only underline font-bold">Review</button></div>` : `<span class="font-semibold text-emerald-800">✓ No ${esc(f.intention.toLowerCase())} swaps suggested from the current master list.</span>`;
 }
 function renderComposition(calc) {

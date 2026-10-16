@@ -660,24 +660,37 @@ function updateStatusBadges() {
   if (!badge || !save) return;
   const pending = outbox.size, nConf = conflicts.size;
   let text, cls;
-  if (!isCloudMode()) { text = 'Local only · not synced'; cls = 'bg-amber-100 text-amber-900'; }
-  else if (nConf) { text = `⚠ ${nConf} conflict${nConf > 1 ? 's' : ''}`; cls = 'bg-rose-100 text-rose-900'; }
-  else if (syncVisualState === 'loading') { text = 'Cloud · loading…'; cls = 'bg-indigo-100 text-indigo-900'; }
-  else if (syncVisualState === 'syncing') { text = 'Cloud · syncing…'; cls = 'bg-indigo-100 text-indigo-900'; }
-  else if (!CLOUD.online) { text = pending ? `Offline · ${pending} pending` : 'Offline · cached copy'; cls = 'bg-amber-100 text-amber-900'; }
-  else if (CLOUD.error) { text = pending ? `Sync error · ${pending} pending` : 'Cloud error'; cls = 'bg-rose-100 text-rose-900'; }
-  else if (pending && CLOUD.isAdmin) { text = `Cloud · ${pending} pending`; cls = 'bg-amber-100 text-amber-900'; }
-  else if (pending) { text = `${pending} unsent · sign in`; cls = 'bg-amber-100 text-amber-900'; }
-  else if (!CLOUD.ready) { text = 'Cloud · connecting…'; cls = 'bg-slate-800 text-slate-300'; }
-  else if (CLOUD.isAdmin) { text = 'Cloud synced · Admin'; cls = 'bg-emerald-100 text-emerald-900'; }
-  else { text = 'Cloud · view only'; cls = 'bg-slate-800 text-slate-300'; }
-  badge.className = 'cloud-state ' + cls; badge.textContent = text;
+  // cls → dot colour: ok (green), warn (amber), err (red pill), info (pulsing blue), muted (grey)
+  if (!isCloudMode()) { text = 'Local only · not synced'; cls = 'warn'; }
+  else if (nConf) { text = `${nConf} conflict${nConf > 1 ? 's' : ''}`; cls = 'err'; }
+  else if (syncVisualState === 'loading') { text = 'Loading…'; cls = 'info'; }
+  else if (syncVisualState === 'syncing') { text = 'Syncing…'; cls = 'info'; }
+  else if (!CLOUD.online) { text = pending ? `Offline · ${pending} pending` : 'Offline · cached copy'; cls = 'warn'; }
+  else if (CLOUD.error) { text = pending ? `Sync error · ${pending} pending` : 'Cloud error'; cls = 'err'; }
+  else if (pending && CLOUD.isAdmin) { text = `${pending} pending`; cls = 'warn'; }
+  else if (pending) { text = `${pending} unsent · sign in`; cls = 'warn'; }
+  else if (!CLOUD.ready) { text = 'Connecting…'; cls = 'info'; }
+  else if (CLOUD.isAdmin) { text = 'Synced'; cls = 'ok'; }
+  else { text = 'View only'; cls = 'muted'; }
+  badge.className = 'cloud-state is-' + cls;
+  badge.innerHTML = `<span class="dot" aria-hidden="true"></span><span>${esc(text)}</span>`;
   const t = META.lastLocalSaveAt ? new Date(META.lastLocalSaveAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '';
-  save.textContent = !canEdit() ? '👁 View only' : (t ? `💾 Saved ${t}` : '💾 Ready');
+  save.textContent = !canEdit() ? 'View only' : (t ? `Saved ${t}` : 'Ready');
+  save.title = META.lastLocalSaveAt ? `Last saved in this browser: ${fmtDate(META.lastLocalSaveAt)}` : '';
   const ab = $('authButton');
   if (ab) {
     ab.hidden = !isCloudMode();
-    ab.textContent = CLOUD.user ? (CLOUD.isAdmin ? '🔓 Admin' : '👤 Signed in · viewer') : '🔐 Admin Login';
+    if (CLOUD.user) {
+      const email = CLOUD.user.email || '';
+      const initials = (email.split('@')[0].split(/[._-]+/).filter(Boolean).slice(0, 2).map(x => x[0]).join('') || '?').toUpperCase();
+      ab.className = 'btn btn-ghost !px-1.5 !pr-2.5';
+      ab.innerHTML = `<span class="avatar">${esc(initials)}</span><span class="hidden md:inline">${CLOUD.isAdmin ? 'Admin' : 'Viewer'}</span>`;
+      ab.title = `${email} · ${CLOUD.isAdmin ? 'administrator (can edit)' : 'view only'}`;
+      ab.setAttribute('aria-label', `Account: ${email}`);
+    } else {
+      ab.className = 'btn btn-secondary';
+      ab.textContent = 'Sign in'; ab.title = 'Sign in to edit'; ab.removeAttribute('aria-label');
+    }
   }
   const fb = $('footerBackupInfo'); if (fb) fb.textContent = `Last backup download: ${META.lastBackupAt ? fmtDate(META.lastBackupAt) : 'never'}${isCloudMode() ? ` · Last cloud sync: ${fmtDate(META.lastSyncAt)}` : ''}`;
 }

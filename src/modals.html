@@ -11,18 +11,25 @@
   <!-- More actions (mobile) -->
   <div id="moreSheet" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-label="More actions">
     <div class="modal-panel max-w-md">
-      <div class="bg-slate-900 px-5 py-3 flex items-center justify-between text-white"><h3 class="font-bold text-sm">Actions</h3><button type="button" data-close class="text-slate-300 font-bold px-2" aria-label="Close">✕</button></div>
-      <div class="modal-body p-4 grid grid-cols-2 gap-2 text-xs font-bold">
-        <button type="button" data-act="create" class="admin-only bg-emerald-500 text-slate-950 rounded-lg px-3 py-3">＋ Create</button>
-        <button type="button" data-act="duplicate" class="admin-only bg-indigo-600 text-white rounded-lg px-3 py-3">⧉ Duplicate</button>
-        <button type="button" data-act="optimizer" class="admin-only bg-amber-500 text-slate-950 rounded-lg px-3 py-3">⚡ Optimizer</button>
-        <button type="button" data-act="delete-current" class="admin-only bg-rose-700 text-white rounded-lg px-3 py-3">🗑 Delete current</button>
-        <button type="button" data-act="backup" class="bg-slate-800 text-emerald-300 rounded-lg px-3 py-3">⬇️ Backup JSON</button>
-        <button type="button" data-act="restore" class="admin-only bg-slate-800 text-indigo-300 rounded-lg px-3 py-3">⬆️ Restore JSON</button>
-        <button type="button" data-act="export" data-format="xls" class="bg-emerald-100 text-emerald-900 rounded-lg px-3 py-3">XLS export</button>
-        <button type="button" data-act="export" data-format="csv" class="bg-emerald-100 text-emerald-900 rounded-lg px-3 py-3">CSV export</button>
-        <button type="button" data-act="export" data-format="pdf" class="bg-emerald-100 text-emerald-900 rounded-lg px-3 py-3">PDF / print</button>
-        <button type="button" data-act="settings" class="bg-slate-100 text-slate-800 rounded-lg px-3 py-3">⚙ Settings</button>
+      <div class="px-5 pt-4 pb-2 flex items-center justify-between"><h3 class="font-semibold text-sm text-ink-900">Actions</h3><button type="button" data-close class="btn btn-ghost btn-icon" aria-label="Close">✕</button></div>
+      <div class="modal-body px-2 pb-4 text-[14px]">
+        <div class="menu-label">Formulation</div>
+        <button type="button" data-act="create" class="admin-only menu-item !py-3">＋ New formulation</button>
+        <button type="button" data-act="duplicate" class="admin-only menu-item !py-3">⧉ Duplicate</button>
+        <button type="button" data-act="optimizer" class="admin-only menu-item !py-3">✦ Optimizer</button>
+        <div class="menu-sep"></div>
+        <div class="menu-label">Export</div>
+        <button type="button" data-act="export" data-format="xls" class="menu-item !py-3">Excel workbook <span class="hint">.xls</span></button>
+        <button type="button" data-act="export" data-format="csv" class="menu-item !py-3">CSV <span class="hint">Sheets import</span></button>
+        <button type="button" data-act="export" data-format="pdf" class="menu-item !py-3">PDF / Print</button>
+        <div class="menu-sep"></div>
+        <div class="menu-label">Data</div>
+        <button type="button" data-act="backup" class="menu-item !py-3">Download backup <span class="hint">JSON</span></button>
+        <button type="button" data-act="restore" class="admin-only menu-item !py-3">Restore from backup…</button>
+        <button type="button" data-act="settings" class="menu-item !py-3">Settings</button>
+        <button type="button" data-act="open-auth" class="menu-item !py-3">Account / sign in</button>
+        <div class="menu-sep"></div>
+        <button type="button" data-act="delete-current" class="admin-only menu-item is-danger !py-3">Delete formulation</button>
       </div>
     </div>
   </div>
@@ -291,4 +298,4 @@
     </div>
   </div>
 
-  <div id="toast" class="no-print fixed left-1/2 -translate-x-1/2 bottom-20 sm:bottom-6 z-[60] bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-lg max-w-[90vw]" role="status" aria-live="polite" hidden></div>
+  <div id="toast" class="no-print fixed left-1/2 -translate-x-1/2 bottom-20 sm:bottom-12 z-[60] bg-ink-900 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-lg max-w-[90vw]" role="status" aria-live="polite" hidden></div>

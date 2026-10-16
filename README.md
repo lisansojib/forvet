@@ -7,14 +7,26 @@ administrators can edit).
 ## Files
 | File | Purpose |
 |---|---|
-| `index.html` | The whole app (styles compiled in; no Tailwind CDN). |
-| `config.js` | Supabase URL + anon key. Empty = local mode. |
+| `dist/index.html` | The whole app, built from `src/` (styles compiled in; no Tailwind CDN). |
+| `config.js` | Supabase URL + anon key. Empty = local mode. Copied to `dist/` by the build. |
 | `supabase/forvet_schema.sql` | Tables, Row Level Security, revision history. Safe to re-run. |
+| `src/` | Source: `head.html`, `body.html`, `modals.html`, `app1–4.js`, `tw.css` (design components). |
+| `tailwind.config.js` | Design tokens: `brand` (primary blue) and `ink` (neutrals). |
+| `tests/` | Playwright tests (`t_local.py` against `dist/` on port 8080; `t_cloud.py` needs Postgres + PostgREST). |
+| `docs/` | Design notes and plans (e.g. `sign-in-plan.md`). |
+
+## Build
+```
+npm install
+python build.py          # → dist/index.html + dist/config.js
+cd dist && python -m http.server 8080
+python tests/t_local.py  # in another terminal
+```
 
 ## 1. Try it locally
-Open `index.html` through any static server (e.g. `npx serve .` or `python -m http.server`).
+Run the build, then open `dist/index.html` through any static server (e.g. `npx serve .` or `python -m http.server`).
 With an empty `config.js`, the app runs in local mode: anyone using the browser can edit, and
-data stays in that browser. Download backups (⬇️ Backup JSON) regularly.
+data stays in that browser. Download backups regularly (toolbar ⋯ → Download backup).
 
 ## 2. Set up Supabase (cloud mode)
 1. Create a project at supabase.com.
@@ -29,7 +41,7 @@ data stays in that browser. Download backups (⬇️ Backup JSON) regularly.
 5. Project Settings → API: copy the **Project URL** and the **anon / publishable** key into `config.js`.
    Never use the `service_role` / secret key in the browser.
 6. Authentication → URL Configuration: set *Site URL* to your deployed address.
-7. Open the app, click **🔐 Admin Login**, sign in. Because the cloud is empty, Forvet offers to
+7. Open the app, click **Sign in** (top right), sign in. Because the cloud is empty, Forvet offers to
    upload this browser's data — accept once. Every later change syncs automatically.
 
 Adding another editor: create the user (step 3) and insert them into `forvet_admins` (step 4).
@@ -37,7 +49,7 @@ Anyone else (signed in or not) can only view. This is enforced by the database, 
 
 ## 3. Host it
 Any static host works: Cloudflare Pages, Netlify, GitHub Pages, or IIS / Kestrel static files.
-Upload `index.html` and `config.js` to the same folder. HTTPS is required for sign-in.
+Upload `dist/index.html` and `dist/config.js` to the same folder. HTTPS is required for sign-in.
 
 ## Moving from the old Forvet.html
 - **Same browser:** opening the new version imports the old saved data automatically. The old copy
@@ -51,7 +63,7 @@ has the link and the anon key (which is inside `config.js`). If that is not acce
 `public read` policies in the SQL to `to authenticated` and give viewers accounts.
 
 ## Backups & recovery
-- ⬇️ Backup JSON downloads everything. Restore asks for confirmation and offers a backup first.
+- ⋯ → *Download backup* downloads everything. Restore asks for confirmation and offers a backup first.
   Formulations missing from a backup move to *Recently deleted*. Materials missing from it are
   archived, not destroyed.
 - Deleting a formulation is a soft delete (restorable in My Formulations → Recently deleted).
@@ -61,11 +73,11 @@ has the link and the anon key (which is inside `config.js`). If that is not acce
   current plan limits, and keep downloading JSON backups.
 
 ## How sync behaves
-- Changes save to the browser immediately, then upload ~1 s later. The header badge shows
-  *synced*, *pending*, *offline* or *conflict*.
+- Changes save to the browser immediately, then upload ~1 s later. The status pill (top right) shows
+  *Synced*, *pending*, *Offline* or *conflict*. The bottom status bar shows the last local save time.
 - Offline edits queue and upload when the connection returns.
 - If two people edit the same record, the second upload is refused. That person chooses
-  *Keep mine* or *Use cloud version* (click the badge). Nothing is overwritten silently.
+  *Keep mine* or *Use cloud version* (click the status pill). Nothing is overwritten silently.
 
 ## Known limitations
 - **Testing coverage:** tested in headless Chromium at desktop and phone sizes, and against PostgreSQL 16 + PostgREST 12 using the

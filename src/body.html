@@ -1,6 +1,6 @@
 <body class="min-h-screen pb-20">
 
-  <button id="backToTopBtn" type="button" hidden class="no-print fixed bottom-5 right-5 z-40 rounded-full bg-slate-900 text-white shadow-lg px-4 py-3 text-xs font-bold" aria-label="Back to top">⬆<span class="btt-text"> Back to Top</span></button>
+  <button id="backToTopBtn" type="button" hidden class="no-print fixed bottom-12 right-5 z-40 rounded-full bg-ink-900 text-white shadow-lg px-4 py-2.5 text-xs font-semibold" aria-label="Back to top">⬆<span class="btt-text"> Back to Top</span></button>
 
   <div id="pdfWatermarkOverlay" aria-hidden="true">
     <div class="watermark-grid">
@@ -15,57 +15,63 @@
     <p class="text-xs text-slate-600">Veterinary formulation &amp; commercial record · printed <span id="printDate"></span></p>
   </div>
 
-  <!-- ===================== HEADER (desktop layout preserved) ===================== -->
-  <header id="appHeader" class="bg-slate-900 text-white shadow-lg sticky top-0 z-30 no-print">
-    <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex flex-wrap items-center gap-3 min-w-0">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center font-extrabold text-slate-950 text-lg shadow-md border border-emerald-300/40">Rx</div>
-          <div class="min-w-0">
-            <div class="flex flex-wrap items-center gap-2">
-              <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white">Forvet <span class="text-emerald-400 font-semibold">by AZ Shohan</span></h1>
-              <span id="saveStatusBadge" class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono">Loading…</span>
-            </div>
-            <p class="text-[11px] text-slate-400">Veterinary Formulation, Analysis &amp; Commercial ERP (৳ BDT)</p>
-          </div>
-        </div>
-        <div class="hidden sm:flex bg-slate-800 p-1 rounded-xl border border-slate-700 items-center shadow-inner" role="group" aria-label="Workspace mode">
-          <button id="btnModeFormulate" type="button" data-mode="formulate" class="mode-btn px-3.5 py-1.5 rounded-lg text-xs font-extrabold">🧪 Formulate</button>
-          <button id="btnModeCalculate" type="button" data-mode="calculate" class="mode-btn px-3.5 py-1.5 rounded-lg text-xs font-extrabold">🧮 Calculate</button>
-        </div>
+  <!-- ===================== HEADER ===================== -->
+  <header id="appHeader" class="bg-white border-b border-ink-200 sticky top-0 z-30 no-print">
+    <!-- Row 1: brand · primary navigation · status · account -->
+    <div class="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
+      <a href="#" class="flex items-center gap-2.5 min-w-0 shrink-0" aria-label="Forvet home" onclick="return false">
+        <span class="appbar-brand-mark">Rx</span>
+        <span class="min-w-0 leading-tight">
+          <span class="block text-[15px] font-semibold tracking-tight text-ink-900">Forvet</span>
+          <span class="hidden lg:block text-[11px] text-ink-500">Formulation &amp; Commercial ERP</span>
+        </span>
+      </a>
+      <nav class="hidden sm:flex items-stretch self-stretch ml-2 border-l border-ink-100 pl-2" aria-label="Main">
+        <button id="btnModeFormulate" type="button" data-mode="formulate" class="mode-btn nav-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6.5L4.6 18.2A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.7-2.8L14 9.5V3"/><path d="M7.5 15h9"/></svg>Formulate</button>
+        <button id="btnModeCalculate" type="button" data-mode="calculate" class="mode-btn nav-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 7h7M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01M8.5 15h.01M12 15h.01M15.5 15h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/></svg>Calculate</button>
+        <button type="button" data-act="open-materials" data-nav="materials" class="nav-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>Materials</button>
+        <button type="button" data-act="open-myforms" class="nav-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Zm0 0A2 2 0 0 0 6 21h13"/><path d="M8.5 7.5h6"/></svg>My Formulations</button>
+      </nav>
+      <div class="ml-auto flex items-center gap-2">
+        <button type="button" id="cloudStatusBadge" data-act="open-sync" class="cloud-state" title="Storage and sync status">Starting…</button>
+        <button type="button" id="authButton" data-act="open-auth" class="btn btn-secondary">Sign in</button>
       </div>
+    </div>
 
-      <div class="flex flex-wrap items-center gap-1.5">
-        <button type="button" data-act="open-materials" class="hidden sm:flex bg-cyan-700 hover:bg-cyan-600 text-white font-extrabold text-xs px-3 py-1.5 rounded-lg items-center gap-1 shadow-sm">🧱 Materials</button>
-        <button type="button" data-act="open-myforms" class="hidden sm:flex bg-sky-700 hover:bg-sky-600 text-white font-extrabold text-xs px-3 py-1.5 rounded-lg items-center gap-1 shadow-sm">📚 My Formulations</button>
-        <button type="button" id="authButton" data-act="open-auth" class="bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs px-3 py-1.5 rounded-lg shadow-sm">🔐 Admin Login</button>
-        <button type="button" id="cloudStatusBadge" data-act="open-sync" class="cloud-state bg-slate-800 text-slate-300" title="Storage and sync status">Starting…</button>
+    <!-- Row 2: current formulation toolbar (desktop/tablet) -->
+    <div class="hidden sm:block border-t border-ink-100 bg-ink-50/70">
+      <div class="max-w-7xl mx-auto px-4 h-12 flex items-center gap-2">
+        <label for="presetSelect" class="text-[12px] font-medium text-ink-500 shrink-0">Formulation</label>
+        <select id="presetSelect" class="product-select picker w-[280px] lg:w-[340px] max-w-full"></select>
 
-        <div class="hidden sm:contents">
-          <button type="button" data-act="create" class="admin-only bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs px-3 py-1.5 rounded-lg shadow-sm">＋ Create</button>
-          <button type="button" data-act="duplicate" class="admin-only bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-2.5 py-1.5 rounded-lg shadow-sm">⧉ Duplicate</button>
-          <button type="button" data-act="delete-current" class="admin-only bg-rose-700 hover:bg-rose-600 text-white font-semibold text-xs px-2.5 py-1.5 rounded-lg shadow-sm" title="Move the current formulation to Recently deleted">🗑 Delete</button>
-          <div class="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
-            <label for="presetSelect" class="sr-only">Current formulation</label>
-            <select id="presetSelect" class="product-select bg-slate-900 text-xs text-white rounded px-2 py-1 border border-slate-600 max-w-[210px]"></select>
-          </div>
-          <button type="button" data-act="optimizer" class="admin-only relative bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
-            <span id="optimizerBtnLabel">Optimizer</span>
-            <span id="swapBadgeCount" class="bg-slate-900 text-amber-300 px-1.5 py-0.5 rounded-full text-[10px] font-bold">0</span>
+        <div class="ml-auto flex items-center gap-1.5">
+          <button type="button" data-act="optimizer" class="admin-only btn btn-ghost" title="Review ingredient swap suggestions">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9Z"/><path d="M19 16v5M16.5 18.5h5"/></svg><span id="optimizerBtnLabel">Optimizer</span><span id="swapBadgeCount" class="count-badge" hidden>0</span>
           </button>
-          <div class="flex items-center bg-slate-800 border border-slate-700 rounded-lg p-1 gap-1">
-            <button type="button" data-act="backup" title="Download a full JSON backup" class="bg-slate-900 hover:bg-slate-700 text-emerald-300 border border-slate-600 text-[11px] font-bold px-2 py-1 rounded">⬇️ Backup JSON</button>
-            <button type="button" data-act="restore" title="Restore from a JSON backup" class="admin-only bg-slate-900 hover:bg-slate-700 text-indigo-300 border border-slate-600 text-[11px] font-bold px-2 py-1 rounded">⬆️ Restore JSON</button>
-            <button type="button" data-act="settings" title="Settings, cost assumptions and reset" class="bg-slate-900 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[11px] font-bold px-1.5 py-1 rounded" aria-label="Settings">⚙</button>
+          <button type="button" data-act="duplicate" class="admin-only btn btn-ghost" title="Duplicate the current formulation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>Duplicate</button>
+
+          <div class="menu" data-menu>
+            <button type="button" class="btn btn-secondary" data-menu-toggle aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Export<svg class="!w-3.5 !h-3.5 text-ink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="menu-pop" role="menu" hidden>
+              <div class="menu-label">Export current formulation</div>
+              <button type="button" role="menuitem" data-act="export" data-format="xls" class="menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Excel workbook<span class="hint">.xls · 5 sheets</span></button>
+              <button type="button" role="menuitem" data-act="export" data-format="csv" class="menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>CSV<span class="hint">Sheets import</span></button>
+              <button type="button" role="menuitem" data-act="export" data-format="pdf" class="menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="7" y="14" width="10" height="7" rx="1"/></svg>PDF / Print<span class="hint">watermarked</span></button>
+            </div>
           </div>
-          <div class="flex items-center bg-emerald-950/90 border border-emerald-600/50 rounded-lg p-1 gap-1">
-            <label for="exportFormatSelect" class="sr-only">Export format</label>
-            <select id="exportFormatSelect" class="bg-slate-900 text-xs text-emerald-200 px-2 py-1 rounded border border-emerald-700">
-              <option value="xls">XLS (5 sheets)</option>
-              <option value="csv">CSV (Sheets import)</option>
-              <option value="pdf">PDF (print, watermark)</option>
-            </select>
-            <button type="button" data-act="export" class="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs px-2.5 py-1 rounded shadow">Finalize</button>
+
+          <button type="button" data-act="create" class="admin-only btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>New formulation</button>
+
+          <div class="menu" data-menu>
+            <button type="button" class="btn btn-ghost btn-icon" data-menu-toggle aria-haspopup="menu" aria-expanded="false" aria-label="More actions" title="More actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg></button>
+            <div class="menu-pop" role="menu" hidden>
+              <div class="menu-label">Data</div>
+              <button type="button" role="menuitem" data-act="backup" class="menu-item" title="Download a full JSON backup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Download backup<span class="hint">JSON</span></button>
+              <button type="button" role="menuitem" data-act="restore" class="admin-only menu-item" title="Restore from a JSON backup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 21h14"/></svg>Restore from backup…</button>
+              <button type="button" role="menuitem" data-act="settings" class="menu-item" title="Settings, cost assumptions and reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Settings</button>
+              <div class="menu-sep"></div>
+              <button type="button" role="menuitem" data-act="delete-current" class="admin-only menu-item is-danger" title="Move the current formulation to Recently deleted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M9 7V4h6v3"/></svg>Delete formulation</button>
+            </div>
           </div>
         </div>
       </div>
@@ -74,12 +80,12 @@
   <input id="restoreJsonInput" type="file" accept=".json,application/json" hidden />
 
   <!-- Compact mobile navigation (stays visible while the header scrolls away) -->
-  <nav id="mobileNav" class="no-print bg-slate-900/95 backdrop-blur text-white px-2 py-1.5 gap-1 items-center justify-between shadow" aria-label="Main">
-    <button type="button" data-mode="formulate" class="mode-btn flex-1 rounded-lg px-2 py-2 text-[11px] font-extrabold">🧪 Formulate</button>
-    <button type="button" data-mode="calculate" class="mode-btn flex-1 rounded-lg px-2 py-2 text-[11px] font-extrabold">🧮 Calculate</button>
-    <button type="button" data-act="open-materials" id="mobileMaterialsBtn" class="flex-1 rounded-lg px-2 py-2 text-[11px] font-extrabold text-slate-300">🧱 Materials</button>
-    <button type="button" data-act="open-myforms" class="flex-1 rounded-lg px-2 py-2 text-[11px] font-extrabold text-slate-300">📚 Saved</button>
-    <button type="button" data-act="open-more" class="rounded-lg px-3 py-2 text-sm font-extrabold text-slate-200 bg-slate-800" aria-label="More actions" aria-haspopup="dialog">⋯</button>
+  <nav id="mobileNav" class="no-print bg-white/95 backdrop-blur border-b border-ink-200 px-1.5 py-1 gap-1 items-center justify-between" aria-label="Main">
+    <button type="button" data-mode="formulate" class="mode-btn mnav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6.5L4.6 18.2A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.7-2.8L14 9.5V3"/><path d="M7.5 15h9"/></svg>Formulate</button>
+    <button type="button" data-mode="calculate" class="mode-btn mnav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 7h7M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01M8.5 15h.01M12 15h.01M15.5 15h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/></svg>Calculate</button>
+    <button type="button" data-act="open-materials" data-nav="materials" id="mobileMaterialsBtn" class="mnav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>Materials</button>
+    <button type="button" data-act="open-myforms" class="mnav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Zm0 0A2 2 0 0 0 6 21h13"/><path d="M8.5 7.5h6"/></svg>Saved</button>
+    <button type="button" data-act="open-more" class="mnav-btn" aria-label="More actions" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg>More</button>
   </nav>
 
   <div id="globalBanner" class="no-print max-w-7xl mx-auto px-4 mt-3" hidden></div>
@@ -525,7 +531,15 @@
     </section>
   </main>
 
-  <footer class="no-print max-w-7xl mx-auto px-4 mt-8 text-[11px] text-slate-500 flex flex-wrap gap-x-4 gap-y-1">
-    <span>Forvet · formulation development aid — verify composition, dosage and processes before commercial use.</span>
-    <span id="footerBackupInfo"></span>
+  <footer class="no-print max-w-7xl mx-auto px-4 mt-10 mb-4 text-[11px] text-ink-400">
+    Formulation development aid — verify composition, dosage and processes before commercial use.
   </footer>
+
+  <!-- Status bar: authorship + save / backup state -->
+  <div id="statusBar" class="no-print fixed bottom-0 inset-x-0 z-20 bg-white/95 backdrop-blur border-t border-ink-200 text-[11px] text-ink-500">
+    <div class="max-w-7xl mx-auto px-4 h-8 flex items-center gap-4">
+      <span class="shrink-0"><span class="font-semibold text-ink-700">Forvet</span> · Formulated by AZ Shohan</span>
+      <span id="footerBackupInfo" class="hidden md:inline truncate"></span>
+      <span id="saveStatusBadge" class="ml-auto shrink-0 font-mono text-ink-600">Loading…</span>
+    </div>
+  </div>

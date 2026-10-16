@@ -13,6 +13,11 @@ with sync_playwright() as p:
     pg.goto('http://localhost:8080/index.html', wait_until='domcontentloaded'); pg.wait_for_function('window.__forvetReady===true')
     pg.select_option('#presetSelect','liquid_cal_vit'); pg.wait_for_timeout(100)
     ok('title has Forvet', 'Forvet' in pg.title(), pg.title())
+    ok('author in footer, not header', 'AZ Shohan' in pg.inner_text('#statusBar') and 'AZ Shohan' not in pg.inner_text('#appHeader'))
+    ok('save time in footer', pg.locator('#statusBar #saveStatusBadge').count()==1)
+    ok('formulate tab active', 'is-active' in pg.get_attribute('#btnModeFormulate','class'))
+    pg.click('header [data-menu-toggle]:has-text("Export")'); pg.keyboard.press('Escape')
+    ok('menu closes on Escape', pg.locator('header .menu-pop:visible').count()==0)
     ok('local badge', 'Local only' in pg.inner_text('#cloudStatusBadge'), pg.inner_text('#cloudStatusBadge'))
     # costing sum check
     tot = pg.inner_text('#totalRawMatCostCell'); bt = pg.inner_text('#ingredientBreakdownTotal')
@@ -93,7 +98,9 @@ with sync_playwright() as p:
     ok('master rate not overwritten', pg.evaluate("S.ingredients.cal_lactate.rate")==390)
     ok('g converted to kg (MSP 6)', any(abs((r.get('qty') or 0)-6)<1e-9 and r['ingId']=='msp_26' for r in f['rows']))
     # backup + restore round trip with reload
+    pg.click('header [data-menu-toggle][aria-label="More actions"]')
     with pg.expect_download() as dl: pg.click('header [data-act=backup]')
+    ok('menu closes after action', pg.locator('header .menu-pop:visible').count()==0)
     path = dl.value.path(); data=json.load(open(path)); ok('backup has data', data['schema']==6 and len(data['formulations'])>=4)
     data['formulations'] = [x for x in data['formulations'] if x['name'] in ('My Test Product','Imported X')]
     data['formulations'][0]['name'] = 'RESTORED ONE'
@@ -104,12 +111,13 @@ with sync_playwright() as p:
     act = pg.evaluate("activeFormulations().map(f=>f.name)")
     ok('restore survives reload', 'RESTORED ONE' in act and len(act)==2, act)
     # exports
-    with pg.expect_download() as dl: pg.click('header [data-act=export]')
+    pg.click('header [data-menu-toggle]:has-text("Export")')
+    with pg.expect_download() as dl: pg.click('header [data-act=export][data-format=xls]')
     xml=open(dl.value.path()).read()
     sheets=re.findall(r'<Worksheet ss:Name="([^"]+)"><Table>(.*?)</Table>', xml, re.S)
     ok('5 xls sheets all with content', len(sheets)==5 and all(t.count('<Row>')>6 for _,t in sheets), [(n,t.count('<Row>')) for n,t in sheets])
-    pg.select_option('#exportFormatSelect','csv')
-    with pg.expect_download() as dl: pg.click('header [data-act=export]')
+    pg.click('header [data-menu-toggle]:has-text("Export")')
+    with pg.expect_download() as dl: pg.click('header [data-act=export][data-format=csv]')
     csv=open(dl.value.path(),encoding='utf-8-sig').read(); ok('csv has sections', all(s in csv for s in ['MASTER FORMULATION','COSTING','MANUFACTURING SOP']))
     with ctx.expect_page() as pi: pg.click('[data-act=export-sop]')
     sop=pi.value; sop.wait_for_load_state(); ok('SOP doc has BOM + phases', 'Bill of materials' in sop.content() and 'Phase 2' in sop.content())

@@ -359,11 +359,10 @@ function openMaterials() {
   $('workspace').hidden = true; $('materialsView').hidden = false;
   closeModal('moreSheet');
   renderMaterials(); window.scrollTo({ top: 0 });
-  $('mobileMaterialsBtn')?.classList.add('bg-emerald-500', 'text-slate-950');
+  syncNavActive();
 }
 function closeMaterials(silent) {
   $('materialsView').hidden = true; $('workspace').hidden = false;
-  $('mobileMaterialsBtn')?.classList.remove('bg-emerald-500', 'text-slate-950');
   renderAll();
   if (!silent) requestAnimationFrame(() => window.scrollTo({ top: materialsReturnY }));
 }

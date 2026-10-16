@@ -586,7 +586,7 @@ async function handleAction(btn) {
     case 'restore': if (requireEdit('restore a backup')) { closeModal('moreSheet'); $('restoreJsonInput').click(); } break;
     case 'settings': openSettings(); break;
     case 'reset-defaults': resetDefaults(); break;
-    case 'export': { closeModal('moreSheet'); const fmt = d.format || $('exportFormatSelect').value; if (fmt === 'csv') exportCsv(); else if (fmt === 'pdf') exportPdf(); else exportXls(); break; }
+    case 'export': { closeModal('moreSheet'); const fmt = d.format || 'xls'; if (fmt === 'csv') exportCsv(); else if (fmt === 'pdf') exportPdf(); else exportXls(); break; }
     case 'export-sop': exportSop(); break;
     case 'save-status': saveStatus(d.status); break;
     case 'add-row': addRow(); break;
@@ -616,8 +616,28 @@ async function handleAction(btn) {
     default: break;
   }
 }
+/* Header dropdown menus ([data-menu] > [data-menu-toggle] + .menu-pop) */
+function closeMenus(except) {
+  qsa('[data-menu]').forEach(m => { if (m === except) return; const pop = m.querySelector('.menu-pop'); if (pop && !pop.hidden) { pop.hidden = true; m.querySelector('[data-menu-toggle]')?.setAttribute('aria-expanded', 'false'); } });
+}
+function toggleMenu(toggle) {
+  const m = toggle.closest('[data-menu]'); const pop = m.querySelector('.menu-pop');
+  closeMenus(m);
+  const open = pop.hidden; pop.hidden = !open; toggle.setAttribute('aria-expanded', String(open));
+  if (open) { applyPermissions(); pop.querySelector('[role=menuitem]:not([disabled])')?.focus({ preventScroll: true }); }
+}
+function onMenuKey(ev) {
+  const pop = ev.target.closest?.('.menu-pop'); if (!pop) return false;
+  const items = [...pop.querySelectorAll('[role=menuitem]:not([disabled])')]; const i = items.indexOf(document.activeElement);
+  if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); const n = items.length; items[(i + (ev.key === 'ArrowDown' ? 1 : -1) + n) % n]?.focus(); return true; }
+  if (ev.key === 'Escape') { const t = pop.closest('[data-menu]').querySelector('[data-menu-toggle]'); closeMenus(); t?.focus(); return true; }
+  return false;
+}
 function wireEvents() {
   document.addEventListener('click', ev => {
+    const menuToggle = ev.target.closest('[data-menu-toggle]');
+    if (menuToggle) { ev.preventDefault(); toggleMenu(menuToggle); return; }
+    closeMenus();
     const actEl = ev.target.closest('[data-act]');
     if (actEl && !actEl.disabled) { ev.preventDefault(); handleAction(actEl); return; }
     const closeEl = ev.target.closest('[data-close]');
@@ -629,6 +649,8 @@ function wireEvents() {
     if (ev.target.classList.contains('modal-backdrop') && ev.target.id !== 'uiDialog') closeModal(ev.target.id);
   });
   document.addEventListener('keydown', ev => {
+    if (onMenuKey(ev)) return;
+    if (ev.key === 'Escape' && qsa('[data-menu] .menu-pop').some(p => !p.hidden)) { closeMenus(); return; }
     if (ev.key === 'Escape' && modalStack.length) { closeModal(modalStack[modalStack.length - 1]); return; }
     if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches?.('[data-pack-row]')) { ev.preventDefault(); setPackKey(ev.target.dataset.packRow); }
   });

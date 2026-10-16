@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="description" content="Forvet — veterinary formulation, costing, materials and commercial pricing." />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#ffffff" />
   <title>Forvet | Veterinary Formulation &amp; Commercial ERP</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23064e3b'/%3E%3Cpath d='M32 8L52 16V30C52 44 43.5 53.5 32 58C20.5 53.5 12 44 12 30V16L32 8Z' fill='%2310b981' fill-opacity='0.2' stroke='%2334d399' stroke-width='3'/%3E%3Ctext x='32' y='41' font-family='Arial,sans-serif' font-size='24' font-weight='bold' fill='%23ffffff' text-anchor='middle'%3ERx%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232a4ad9'/%3E%3Ctext x='32' y='41' font-family='Arial,sans-serif' font-size='24' font-weight='bold' fill='%23ffffff' text-anchor='middle'%3ERx%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" />
@@ -16,15 +16,14 @@
 /*__TAILWIND__*/
   </style>
   <style>
-    body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background-color: #f1f5f9; color: #0f172a; }
+    body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background-color: #f6f7f9; color: #1f2430; }
     .mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     [hidden] { display: none !important; }
-    :focus-visible { outline: 2px solid #10b981; outline-offset: 2px; }
+    :focus-visible { outline: 2px solid #3d65ef; outline-offset: 2px; }
     button:disabled, input:disabled, select:disabled, textarea:disabled { cursor: not-allowed; }
     .ro-lock input:disabled, .ro-lock select:disabled, .ro-lock textarea:disabled { background-color: #f8fafc; color: #334155; opacity: 1; }
     .admin-only[disabled] { opacity: .5; }
 
-    .cloud-state { font-size: 10px; border: 1px solid #475569; border-radius: 999px; padding: .18rem .55rem; white-space: nowrap; cursor: pointer; }
     .sec-toggle { border: 1px solid #cbd5e1; border-radius: .5rem; padding: .25rem .55rem; font-size: .7rem; font-weight: 700; color: #334155; background: #f8fafc; white-space: nowrap; }
     .sec-toggle:hover { background: #e2e8f0; }
     section.is-collapsed > .sec-head { border-bottom-width: 0 !important; padding-bottom: 0 !important; }
@@ -47,7 +46,7 @@
     @media (max-width: 640px) {
       #appHeader { position: static !important; }
       #mobileNav { display: flex; position: sticky; top: 0; z-index: 30; }
-      #backToTopBtn { right: .6rem; bottom: .75rem; padding: .55rem .7rem; }
+      #backToTopBtn { right: .6rem; bottom: 2.75rem; padding: .55rem .7rem; }
       #backToTopBtn .btt-text { display: none; }
       .modal-backdrop { align-items: flex-end; padding: 0; }
       .modal-panel { border-radius: 1rem 1rem 0 0; max-height: 94dvh; }
@@ -56,7 +55,7 @@
     /* Print / PDF export */
     #pdfWatermarkOverlay { display: none; }
     @media print {
-      .no-print, #mobileNav, #appHeader { display: none !important; }
+      .no-print, #mobileNav, #appHeader, #statusBar { display: none !important; }
       body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .print-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; break-inside: avoid; margin-bottom: 12px !important; }
       .sec-body[hidden] { display: block !important; }
