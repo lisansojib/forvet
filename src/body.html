@@ -1,0 +1,531 @@
+<body class="min-h-screen pb-20">
+
+  <button id="backToTopBtn" type="button" hidden class="no-print fixed bottom-5 right-5 z-40 rounded-full bg-slate-900 text-white shadow-lg px-4 py-3 text-xs font-bold" aria-label="Back to top">⬆<span class="btt-text"> Back to Top</span></button>
+
+  <div id="pdfWatermarkOverlay" aria-hidden="true">
+    <div class="watermark-grid">
+      <div class="watermark-text">Forvet &bull; Formulated by AZ Shohan &bull; Forvet</div>
+      <div class="watermark-text">Forvet &bull; Formulated by AZ Shohan &bull; Forvet</div>
+      <div class="watermark-text">Forvet &bull; Formulated by AZ Shohan &bull; Forvet</div>
+    </div>
+  </div>
+
+  <div class="print-only border-b-2 border-emerald-800 pb-3 mb-4 px-4 pt-2">
+    <h1 class="text-xl font-extrabold text-slate-900">Forvet</h1>
+    <p class="text-xs text-slate-600">Veterinary formulation &amp; commercial record · printed <span id="printDate"></span></p>
+  </div>
+
+  <!-- ===================== HEADER (desktop layout preserved) ===================== -->
+  <header id="appHeader" class="bg-slate-900 text-white shadow-lg sticky top-0 z-30 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-3 min-w-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center font-extrabold text-slate-950 text-lg shadow-md border border-emerald-300/40">Rx</div>
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white">Forvet <span class="text-emerald-400 font-semibold">by AZ Shohan</span></h1>
+              <span id="saveStatusBadge" class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono">Loading…</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Veterinary Formulation, Analysis &amp; Commercial ERP (৳ BDT)</p>
+          </div>
+        </div>
+        <div class="hidden sm:flex bg-slate-800 p-1 rounded-xl border border-slate-700 items-center shadow-inner" role="group" aria-label="Workspace mode">
+          <button id="btnModeFormulate" type="button" data-mode="formulate" class="mode-btn px-3.5 py-1.5 rounded-lg text-xs font-extrabold">🧪 Formulate</button>
+          <button id="btnModeCalculate" type="button" data-mode="calculate" class="mode-btn px-3.5 py-1.5 rounded-lg text-xs font-extrabold">🧮 Calculate</button>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-1.5">
+        <button type="button" data-act="open-materials" class="hidden sm:flex bg-cyan-700 hover:bg-cyan-600 text-white font-extrabold text-xs px-3 py-1.5 rounded-lg items-center gap-1 shadow-sm">🧱 Materials</button>
+        <button type="button" data-act="open-myforms" class="hidden sm:flex bg-sky-700 hover:bg-sky-600 text-white font-extrabold text-xs px-3 py-1.5 rounded-lg items-center gap-1 shadow-sm">📚 My Formulations</button>
+        <button type="button" id="authButton" data-act="open-auth" class="bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs px-3 py-1.5 rounded-lg shadow-sm">🔐 Admin Login</button>
+        <button type="button" id="cloudStatusBadge" data-act="open-sync" class="cloud-state bg-slate-800 text-slate-300" title="Storage and sync status">Starting…</button>
+
+        <div class="hidden sm:contents">
+          <button type="button" data-act="create" class="admin-only bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs px-3 py-1.5 rounded-lg shadow-sm">＋ Create</button>
+          <button type="button" data-act="duplicate" class="admin-only bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-2.5 py-1.5 rounded-lg shadow-sm">⧉ Duplicate</button>
+          <button type="button" data-act="delete-current" class="admin-only bg-rose-700 hover:bg-rose-600 text-white font-semibold text-xs px-2.5 py-1.5 rounded-lg shadow-sm" title="Move the current formulation to Recently deleted">🗑 Delete</button>
+          <div class="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
+            <label for="presetSelect" class="sr-only">Current formulation</label>
+            <select id="presetSelect" class="product-select bg-slate-900 text-xs text-white rounded px-2 py-1 border border-slate-600 max-w-[210px]"></select>
+          </div>
+          <button type="button" data-act="optimizer" class="admin-only relative bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
+            <span id="optimizerBtnLabel">Optimizer</span>
+            <span id="swapBadgeCount" class="bg-slate-900 text-amber-300 px-1.5 py-0.5 rounded-full text-[10px] font-bold">0</span>
+          </button>
+          <div class="flex items-center bg-slate-800 border border-slate-700 rounded-lg p-1 gap-1">
+            <button type="button" data-act="backup" title="Download a full JSON backup" class="bg-slate-900 hover:bg-slate-700 text-emerald-300 border border-slate-600 text-[11px] font-bold px-2 py-1 rounded">⬇️ Backup JSON</button>
+            <button type="button" data-act="restore" title="Restore from a JSON backup" class="admin-only bg-slate-900 hover:bg-slate-700 text-indigo-300 border border-slate-600 text-[11px] font-bold px-2 py-1 rounded">⬆️ Restore JSON</button>
+            <button type="button" data-act="settings" title="Settings, cost assumptions and reset" class="bg-slate-900 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[11px] font-bold px-1.5 py-1 rounded" aria-label="Settings">⚙</button>
+          </div>
+          <div class="flex items-center bg-emerald-950/90 border border-emerald-600/50 rounded-lg p-1 gap-1">
+            <label for="exportFormatSelect" class="sr-only">Export format</label>
+            <select id="exportFormatSelect" class="bg-slate-900 text-xs text-emerald-200 px-2 py-1 rounded border border-emerald-700">
+              <option value="xls">XLS (5 sheets)</option>
+              <option value="csv">CSV (Sheets import)</option>
+              <option value="pdf">PDF (print, watermark)</option>
+            </select>
+            <button type="button" data-act="export" class="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs px-2.5 py-1 rounded shadow">Finalize</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <input id="restoreJsonInput" type="file" accept=".json,application/json" hidden />
+
+  <!-- Compact mobile navigation (stays visible while the header scrolls away) -->
+  <nav id="mobileNav" class="no-print bg-slate-900/95 backdrop-blur text-white px-2 py-1.5 gap-1 items-center justify-between shadow" aria-label="Main">
+    <button type="button" data-mode="formulate" class="mode-btn flex-1 rounded-lg px-2 py-2 text-[11px] font-extrabold">🧪 Formulate</button>
+    <button type="button" data-mode="calculate" class="mode-btn flex-1 rounded-lg px-2 py-2 text-[11px] font-extrabold">🧮 Calculate</button>
+    <button type="button" data-act="open-materials" id="mobileMaterialsBtn" class="flex-1 rounded-lg px-2 py-2 text-[11px] font-extrabold text-slate-300">🧱 Materials</button>
+    <button type="button" data-act="open-myforms" class="flex-1 rounded-lg px-2 py-2 text-[11px] font-extrabold text-slate-300">📚 Saved</button>
+    <button type="button" data-act="open-more" class="rounded-lg px-3 py-2 text-sm font-extrabold text-slate-200 bg-slate-800" aria-label="More actions" aria-haspopup="dialog">⋯</button>
+  </nav>
+
+  <div id="globalBanner" class="no-print max-w-7xl mx-auto px-4 mt-3" hidden></div>
+
+  <main class="max-w-7xl mx-auto px-4 mt-6 space-y-6">
+
+    <!-- ===================== WORKSPACE ===================== -->
+    <div id="workspace" class="space-y-6">
+
+      <div id="formulateTop" class="space-y-6">
+        <!-- PRODUCT PARAMETERS -->
+        <section data-collapsible="product" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 print-card">
+          <div class="sec-head flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-200">
+            <h2 class="text-base font-bold text-slate-900">Product Parameters</h2>
+          </div>
+          <div class="sec-body">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-4 items-end">
+              <div class="md:col-span-3 sm:col-span-2">
+                <label for="productName" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Product Name</label>
+                <input id="productName" type="text" autocomplete="off" class="edit-ctl w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+              <div class="md:col-span-2">
+                <label for="productForm" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Product Form</label>
+                <select id="productForm" class="edit-ctl w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-semibold bg-slate-50">
+                  <option value="Liquid">Liquid (Measured in L)</option>
+                  <option value="Powder">Powder (Measured in kg)</option>
+                </select>
+              </div>
+              <div class="md:col-span-2">
+                <label for="batchSize" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Batch Size (<span id="batchUnitLabel">L</span>)</label>
+                <input id="batchSize" type="number" min="0.01" step="0.01" list="batchSizeList" inputmode="decimal" class="edit-ctl w-full px-3 py-2 rounded-lg border border-emerald-500 bg-emerald-50/50 text-emerald-950 text-sm font-bold mono" />
+                <datalist id="batchSizeList"><option value="5"></option><option value="10"></option><option value="50"></option><option value="100"></option><option value="500"></option><option value="1000"></option></datalist>
+              </div>
+              <div class="md:col-span-2">
+                <label for="formulationIntention" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Formulation Intention</label>
+                <select id="formulationIntention" class="edit-ctl w-full px-3 py-2 rounded-lg border border-indigo-400 bg-indigo-50/60 text-indigo-950 text-xs font-bold">
+                  <option value="Cost Effective">💰 Cost Effective (Low BDT)</option>
+                  <option value="Performance">🚀 Performance (High Absorption)</option>
+                </select>
+              </div>
+              <fieldset class="md:col-span-3 sm:col-span-2">
+                <legend class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Target Species</legend>
+                <div class="flex flex-wrap items-center gap-1.5 bg-slate-50 p-1.5 rounded-lg border border-slate-300">
+                  <label class="flex items-center gap-1 text-xs font-medium px-1.5 py-1 rounded cursor-pointer hover:bg-white"><input type="checkbox" class="species-checkbox edit-ctl accent-emerald-600" value="Cattle" /> <span>🐄 Cattle</span></label>
+                  <label class="flex items-center gap-1 text-xs font-medium px-1.5 py-1 rounded cursor-pointer hover:bg-white"><input type="checkbox" class="species-checkbox edit-ctl accent-emerald-600" value="Poultry" /> <span>🐓 Poultry</span></label>
+                  <label class="flex items-center gap-1 text-xs font-medium px-1.5 py-1 rounded cursor-pointer hover:bg-white"><input type="checkbox" class="species-checkbox edit-ctl accent-emerald-600" value="Fish and Shrimps" /> <span>🐟🦐 Fish/Shrimp</span></label>
+                </div>
+              </fieldset>
+            </div>
+            <div class="sm:hidden mt-3">
+              <label for="presetSelectMobile" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Switch formulation</label>
+              <select id="presetSelectMobile" class="product-select w-full px-3 py-2 rounded-lg border border-slate-300 text-sm bg-white"></select>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4">
+              <div id="missingPuzzlesBanner" class="p-3.5 rounded-lg border text-xs"></div>
+              <div id="compatibilityBanner" class="p-3.5 rounded-lg border text-xs"></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- 1. MASTER FORMULATION SHEET -->
+          <section data-collapsible="formula" class="lg:col-span-8 min-w-0 bg-white rounded-xl shadow-sm border border-slate-200 p-5 print-card">
+            <div class="sec-head flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-slate-200">
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h2 class="text-base font-bold text-slate-900">1. Master Formulation Sheet</h2>
+                  <span id="masterFormUnitPill" class="text-xs font-semibold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full"></span>
+                  <span id="formulaStatusBadge" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full"></span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">Quantities below 0.1 kg/L also show in g/ml. The Q.S. carrier row automatically makes up the rest of the batch.</p>
+              </div>
+            </div>
+            <div class="sec-body">
+              <div class="flex flex-wrap items-center gap-1.5 no-print mt-3">
+                <button type="button" data-act="save-status" data-status="In Progress" class="admin-only text-xs bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 font-bold px-2.5 py-1.5 rounded-lg">⏳ Save "In Progress"</button>
+                <button type="button" data-act="save-status" data-status="Complete" class="admin-only text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1.5 rounded-lg shadow-sm">✅ Save "Complete"</button>
+                <button type="button" data-act="open-import" class="admin-only text-xs bg-slate-800 hover:bg-slate-700 text-white font-semibold px-2.5 py-1.5 rounded-lg">📥 Import</button>
+                <button type="button" data-act="open-analyze" class="admin-only text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2.5 py-1.5 rounded-lg">🔬 Analyze</button>
+                <button type="button" data-act="open-compare" class="text-xs bg-teal-700 hover:bg-teal-600 text-white font-semibold px-2.5 py-1.5 rounded-lg">⚖️ Compare</button>
+                <button type="button" data-act="add-row" class="admin-only text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-extrabold px-2.5 py-1.5 rounded-lg">+ Add Row</button>
+              </div>
+              <p class="sm:hidden text-[10px] text-slate-500 mt-2 no-print">Swipe the table sideways to see quantity, rate and cost.</p>
+              <div class="overflow-x-auto mt-3 -mx-1 px-1">
+                <table class="formula-table w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-slate-200 text-[11px] uppercase tracking-wider text-slate-500 bg-slate-50">
+                      <th scope="col" class="col-ing py-2.5 px-2">Raw Material / Ingredient</th>
+                      <th scope="col" class="py-2.5 px-1.5 w-14 text-center">Abs%</th>
+                      <th scope="col" class="py-2.5 px-1.5 w-28 text-right">Qty. - kg/L</th>
+                      <th scope="col" class="py-2.5 px-1.5 w-24 text-right">Auto-Unit</th>
+                      <th scope="col" class="py-2.5 px-1.5 w-24 text-right">Rate (৳)</th>
+                      <th scope="col" class="py-2.5 px-1.5 w-24 text-right">Cost (৳)</th>
+                      <th scope="col" class="py-2.5 px-1.5 w-20 text-center no-print">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="formulaTableBody" class="divide-y divide-slate-200 text-xs"></tbody>
+                  <tfoot>
+                    <tr class="bg-slate-50 font-bold text-xs border-t-2 border-slate-300">
+                      <td colspan="2" class="py-3 px-2 text-slate-700">Total batch input (Q.S. balanced)</td>
+                      <td id="totalBatchInputRaw" class="py-3 px-1.5 text-right mono text-slate-900"></td>
+                      <td id="totalBatchFillStatus" class="py-3 px-1.5 text-right"></td>
+                      <td class="py-3 px-1.5 text-right text-slate-500">Raw Total:</td>
+                      <td id="totalRawMatCostCell" class="py-3 px-1.5 text-right mono text-emerald-700 text-sm"></td>
+                      <td class="no-print"></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <div id="formulaWarnings" class="mt-3 space-y-1.5 text-xs"></div>
+            </div>
+          </section>
+
+          <!-- 2. BULK COSTING ENGINE -->
+          <section data-collapsible="costing" class="lg:col-span-4 min-w-0 bg-white rounded-xl shadow-sm border border-slate-200 p-5 print-card">
+            <div class="sec-head pb-3 border-b border-slate-200 flex items-start justify-between gap-2">
+              <div>
+                <h2 class="text-base font-bold text-slate-900">2. Bulk Costing Engine (৳ BDT)</h2>
+                <p class="text-xs text-slate-500">Raw materials + manufacturing overhead</p>
+              </div>
+            </div>
+            <div class="sec-body">
+              <div class="mt-4 space-y-2.5 text-xs">
+                <div class="flex justify-between items-center py-1 border-b border-slate-100"><span class="text-slate-600">Active ingredients cost:</span><span id="costActives" class="mono font-semibold text-slate-900"></span></div>
+                <div class="flex justify-between items-center py-1 border-b border-slate-100"><span class="text-slate-600">Excipients, carrier &amp; water cost:</span><span id="costExcipients" class="mono font-semibold text-slate-900"></span></div>
+                <div class="flex justify-between items-center py-1.5 border-b border-slate-200"><span class="text-slate-800 font-bold">Total raw material cost (batch):</span><span id="costRawBatch" class="mono font-bold text-slate-900"></span></div>
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-1">
+                  <div class="flex justify-between items-center"><span class="font-semibold text-amber-900">Manufacturing overhead:</span><span id="overheadRateLabel" class="mono font-bold text-amber-900"></span></div>
+                  <div class="flex justify-between items-center text-[11px] text-amber-800"><span>Batch overhead (<span id="overheadBatchMultiplier"></span>):</span><span id="costOverheadBatch" class="mono font-bold"></span></div>
+                </div>
+                <div class="bg-slate-900 text-white rounded-xl p-4 space-y-2 mt-2 shadow">
+                  <div class="flex justify-between items-center border-b border-slate-700 pb-2 gap-2"><span class="text-slate-300">Bulk cost per batch (raw + overhead):</span><span id="costGrandBatch" class="mono text-base font-bold text-emerald-400"></span></div>
+                  <div class="flex justify-between items-center gap-2"><span class="text-slate-300 font-medium">Bulk cost per 1 <span class="unit-main">L</span>:</span><span id="costPerUnitKgL" class="mono text-base font-extrabold text-white"></span></div>
+                  <div class="flex justify-between items-center text-[11px] text-slate-400 pt-1 border-t border-slate-800 gap-2"><span>Packaging for <span id="costPackLabel"></span>:</span><span id="costPackagingBatchSummary" class="mono text-amber-300"></span></div>
+                  <div class="flex justify-between items-center text-xs font-bold text-emerald-300 pt-1 border-t border-slate-800 gap-2"><span>All-in batch COGS (with packaging):</span><span id="costAllInWithPackBatch" class="mono"></span></div>
+                </div>
+              </div>
+              <div class="mt-4 border border-slate-200 rounded-lg overflow-hidden">
+                <div class="bg-slate-100 px-3 py-2 flex items-center justify-between gap-2">
+                  <h3 class="text-xs font-extrabold text-slate-800">Individual Ingredient Cost Breakdown</h3>
+                  <span class="text-[10px] text-slate-500">Qty × Rate = Cost</span>
+                </div>
+                <div class="overflow-x-auto max-h-80 overflow-y-auto">
+                  <table class="w-full min-w-[420px] text-left border-collapse text-[11px]">
+                    <thead class="sticky top-0 bg-white border-b border-slate-200 text-slate-500 uppercase">
+                      <tr><th class="py-2 px-2">Ingredient</th><th class="py-2 px-2 text-right">Qty (<span class="unit-main">L</span>)</th><th class="py-2 px-2 text-right">Rate (৳/<span class="unit-main">L</span>)</th><th class="py-2 px-2 text-right">Cost (৳)</th></tr>
+                    </thead>
+                    <tbody id="individualIngredientCostBody" class="divide-y divide-slate-100"></tbody>
+                    <tfoot><tr class="bg-slate-50 font-extrabold"><td class="py-2 px-2" colspan="3">Total raw material cost</td><td id="ingredientBreakdownTotal" class="py-2 px-2 text-right mono"></td></tr></tfoot>
+                  </table>
+                </div>
+              </div>
+              <div id="costWarnings" class="mt-3 space-y-1.5 text-xs"></div>
+              <div id="costSavingsCallout" class="mt-3 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs"></div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div id="formulateLower" class="space-y-6">
+        <!-- 3. LABEL COMPOSITION -->
+        <section data-collapsible="label" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 print-card">
+          <div class="sec-head flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <div class="min-w-0">
+              <h2 class="text-base font-bold text-slate-900">3. Label Composition (<span id="compositionHeaderUnit">per 1 ml</span>)</h2>
+              <p class="text-xs text-slate-500">Rows whose role is <strong>Active Ingredients</strong>. Vitamin A and D3 are shown in IU: verified when the material has a supplier-declared IU/g, otherwise marked <em>est.</em></p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 no-print">
+              <label for="compBasisSelect" class="text-xs font-semibold text-slate-700">Display per:</label>
+              <select id="compBasisSelect" class="bg-indigo-50 border border-indigo-300 text-indigo-950 text-xs font-bold px-3 py-1.5 rounded-lg">
+                <option value="1">Per 1 ml</option><option value="5">Per 5 ml</option><option value="100">Per 100 ml</option><option value="1000">Per 1 L</option><option value="custom">Custom…</option>
+              </select>
+              <span id="compCustomInputWrap" class="items-center gap-1" hidden>
+                <input id="compCustomValue" type="number" step="0.01" min="0.01" value="10" class="w-20 px-2 py-1 text-xs font-bold border border-indigo-400 rounded mono text-right" aria-label="Custom amount" />
+                <span id="compCustomUnitLabel" class="text-xs font-bold text-indigo-900">ml</span>
+              </span>
+            </div>
+          </div>
+          <div class="sec-body">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-4">
+              <div class="lg:col-span-7 min-w-0">
+                <div class="flex flex-wrap items-center justify-between mb-2 gap-2">
+                  <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Output A: By active ingredient</h3>
+                  <span id="compositionUnitBadgeA" class="text-[11px] font-mono font-bold bg-slate-100 text-slate-800 px-2 py-0.5 rounded"></span>
+                </div>
+                <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                  <table class="w-full min-w-[480px] text-left border-collapse text-xs">
+                    <thead><tr class="border-b border-slate-200 bg-slate-50 text-[11px] uppercase text-slate-500"><th class="py-2 px-2.5">Active raw material</th><th class="py-2 px-2.5">Active moiety</th><th class="py-2 px-2.5 text-right">Raw input</th><th class="py-2 px-2.5 text-right">Active claim</th></tr></thead>
+                    <tbody id="compositionTableBody" class="divide-y divide-slate-200"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="lg:col-span-5 min-w-0">
+                <div class="flex flex-wrap items-center justify-between mb-2 gap-2">
+                  <h3 class="text-xs font-extrabold uppercase tracking-wider text-emerald-800">Output B: Total elemental value</h3>
+                  <span id="compositionUnitBadgeB" class="text-[11px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded"></span>
+                </div>
+                <div class="overflow-x-auto border border-emerald-200 rounded-lg bg-emerald-50/20">
+                  <table class="w-full min-w-[360px] text-left border-collapse text-xs">
+                    <thead><tr class="border-b border-emerald-200 bg-emerald-50/80 text-[11px] uppercase text-emerald-900"><th class="py-2 px-2.5">Element / group</th><th class="py-2 px-2.5">Sources</th><th class="py-2 px-2.5 text-right">Total</th></tr></thead>
+                    <tbody id="elementalSumTableBody" class="divide-y divide-emerald-100"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div id="labelWarnings" class="mt-3 space-y-1.5 text-xs"></div>
+          </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- 4. INDICATIONS & DOSAGE -->
+          <section data-collapsible="dosage" class="lg:col-span-5 min-w-0 bg-white rounded-xl shadow-sm border border-slate-200 p-5 print-card">
+            <div class="sec-head pb-3 border-b border-slate-200 flex items-start justify-between gap-2">
+              <div>
+                <h2 class="text-base font-bold text-slate-900">4. Indications &amp; Species-Specific Dosage</h2>
+                <p class="text-xs text-slate-500">Generated from active materials and target species — a development aid that needs professional review.</p>
+              </div>
+            </div>
+            <div class="sec-body mt-3 space-y-4 text-xs">
+              <div>
+                <h3 class="font-bold text-slate-800 uppercase tracking-wider text-[11px] mb-1.5">Therapeutic &amp; nutritional indications</h3>
+                <ul id="indicationsList" class="space-y-1.5 text-slate-700 list-disc pl-4"></ul>
+              </div>
+              <div class="border-t border-slate-200 pt-3">
+                <h3 class="font-bold text-slate-800 uppercase tracking-wider text-[11px] mb-2">Suggested dosage &amp; administration</h3>
+                <div id="dosageCardsContainer" class="space-y-2"></div>
+              </div>
+              <div class="border-t border-slate-200 pt-3">
+                <label for="dosageNotes" class="font-bold text-slate-800 uppercase tracking-wider text-[11px] mb-1 block">Reviewed dosage &amp; label notes</label>
+                <textarea id="dosageNotes" rows="3" class="edit-ctl w-full p-2 border border-slate-300 rounded-lg text-xs" placeholder="Final reviewed indications, dose, withdrawal period, cautions… (included in exports)"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <!-- 5. MANUFACTURING SOP -->
+          <section data-collapsible="sop" class="lg:col-span-7 min-w-0 bg-white rounded-xl shadow-sm border border-slate-200 p-5 print-card">
+            <div class="sec-head flex flex-wrap items-start justify-between gap-2 pb-3 border-b border-slate-200">
+              <div class="min-w-0">
+                <h2 class="text-base font-bold text-slate-900">5. Manufacturing SOP &amp; Phase Target pH</h2>
+                <p class="text-xs text-slate-500">Scaled to <span id="sopBatchLabel" class="font-semibold text-slate-800"></span> with phase targets.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span id="sopProcessTypeBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200"></span>
+                <button type="button" data-act="export-sop" class="no-print bg-rose-700 hover:bg-rose-600 text-white font-extrabold text-xs px-3 py-2 rounded-lg shadow">📄 Export SOP (PDF)</button>
+              </div>
+            </div>
+            <div class="sec-body">
+              <div id="sopReadiness" class="mt-3 text-xs"></div>
+              <div id="sopStepsContainer" class="mt-3 grid grid-cols-1 gap-3"></div>
+              <div class="mt-3">
+                <label for="processNotes" class="font-bold text-slate-800 uppercase tracking-wider text-[11px] mb-1 block">Process notes (equipment, checks, deviations)</label>
+                <textarea id="processNotes" rows="3" class="edit-ctl w-full p-2 border border-slate-300 rounded-lg text-xs" placeholder="e.g. SS316L 200 L vessel, filter 5 µm, in-process pH check after phase 2… (included in the SOP export)"></textarea>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- 2B. PACKAGING, TP, MRP & NET PROFIT -->
+      <section id="packagingSection" data-collapsible="commercial" class="bg-white rounded-xl shadow-sm border-2 border-emerald-600/30 p-5 print-card">
+        <div class="sec-head bg-slate-900 text-white p-4 rounded-xl flex flex-wrap items-center justify-between gap-4">
+          <div class="min-w-0">
+            <span class="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold block">Commercial &amp; packaging</span>
+            <h2 class="text-base font-extrabold">2B. Packaging Costing, Distributor TP, Retail MRP &amp; Profit</h2>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-emerald-500/50 min-w-0">
+              <label for="calcProductSelect" class="text-xs font-bold text-emerald-300 whitespace-nowrap">Product:</label>
+              <select id="calcProductSelect" class="product-select bg-slate-950 text-xs font-bold text-white px-3 py-1.5 rounded border border-slate-600 min-w-0 max-w-[260px]"></select>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+              <label for="packSizeSelect" class="text-xs font-bold text-slate-300">Pack Size:</label>
+              <select id="packSizeSelect" class="bg-slate-950 text-xs font-bold text-emerald-300 px-2.5 py-1.5 rounded border border-slate-600"></select>
+            </div>
+          </div>
+        </div>
+        <div class="sec-body space-y-5 mt-5">
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Step 1: Packaging material cost per <span id="packComponentHeaderUnit"></span> pack</h3>
+              <span class="text-[11px] text-slate-500">Shared packaging rates — apply to every <span id="packFormTitle"></span> product using this pack</span>
+            </div>
+            <div id="packagingInputsGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"></div>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-4">
+            <div class="flex flex-wrap items-start justify-between gap-2 border-b border-slate-200 pb-2.5">
+              <div class="min-w-0">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-emerald-950">Step 2: Commercial pricing for this product &amp; pack size</h3>
+                <p class="text-[11px] text-slate-500">These values are stored for <strong id="packSettingsScope"></strong> only. Other pack sizes keep their own values.</p>
+              </div>
+              <span id="calcActiveProductSummaryPill" class="text-[11px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-1 rounded"></span>
+            </div>
+            <div id="packSettingsNote" class="text-[11px]"></div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+              <div class="bg-amber-50/80 p-3 rounded-lg border border-amber-300">
+                <label for="commMrpInput" class="block text-[11px] font-bold text-amber-950 mb-1">1. Retail MRP (৳ / pack)</label>
+                <input id="commMrpInput" type="number" step="0.01" min="0" inputmode="decimal" class="comm-input edit-ctl w-full px-2.5 py-1.5 text-right bg-white border border-amber-400 rounded mono text-sm font-extrabold text-amber-950" />
+                <div class="text-[10px] text-amber-800 mt-1 flex justify-between"><span>Retailer spread vs TP:</span><span id="commRetailSpreadLabel" class="mono font-bold"></span></div>
+              </div>
+              <div class="bg-emerald-50/80 p-3 rounded-lg border border-emerald-300">
+                <label for="commTpInput" class="block text-[11px] font-bold text-emerald-950 mb-1">2. Trade Price — TP (৳ / pack)</label>
+                <input id="commTpInput" type="number" step="0.01" min="0" inputmode="decimal" class="comm-input edit-ctl w-full px-2.5 py-1.5 text-right bg-white border border-emerald-400 rounded mono text-sm font-extrabold text-emerald-950" />
+                <div class="text-[10px] text-emerald-800 mt-1">Distributor invoice price</div>
+              </div>
+              <div class="bg-indigo-50/70 p-3 rounded-lg border border-indigo-200">
+                <label for="commBonusSelect" class="block text-[11px] font-bold text-indigo-950 mb-1">3. Bonus scheme</label>
+                <select id="commBonusSelect" class="comm-input edit-ctl w-full px-2 py-1.5 bg-white border border-indigo-300 rounded text-xs font-bold text-indigo-950">
+                  <option value="none">No bonus</option>
+                  <option value="1_5">1 free with 5 paid (1+5)</option>
+                  <option value="2_10">2 free with 10 paid (2+10)</option>
+                  <option value="custom">Custom (X free with Y paid)…</option>
+                </select>
+                <div id="customBonusInputsWrap" class="grid grid-cols-2 gap-1.5 mt-1.5" hidden>
+                  <label class="text-[9px] text-indigo-800">Free (X)<input id="customBonusFree" type="number" min="0" step="1" inputmode="numeric" class="comm-input edit-ctl w-full px-1.5 py-0.5 text-right border border-indigo-300 rounded mono text-xs font-bold" /></label>
+                  <label class="text-[9px] text-indigo-800">Paid (Y)<input id="customBonusPaid" type="number" min="1" step="1" inputmode="numeric" class="comm-input edit-ctl w-full px-1.5 py-0.5 text-right border border-indigo-300 rounded mono text-xs font-bold" /></label>
+                </div>
+                <div class="text-[10px] text-indigo-800 mt-1 flex justify-between"><span>Bonus dilution / pack:</span><span id="commBonusDeductionLabel" class="mono font-bold"></span></div>
+              </div>
+              <div class="bg-white p-3 rounded-lg border border-slate-200">
+                <label for="commCashDiscPct" class="block text-[11px] font-bold text-slate-700 mb-1">4. Cash discount (% of TP)</label>
+                <input id="commCashDiscPct" type="number" step="0.01" min="0" max="100" inputmode="decimal" class="comm-input edit-ctl w-full px-2.5 py-1.5 text-right bg-slate-50 border border-slate-300 rounded mono text-xs font-bold" />
+                <div class="text-[10px] text-slate-500 mt-1 flex justify-between"><span>Discount:</span><span id="commCashDiscBdtLabel" class="mono font-bold text-rose-600"></span></div>
+              </div>
+              <div class="bg-white p-3 rounded-lg border border-slate-200">
+                <label for="commAdditionalOfferBdt" class="block text-[11px] font-bold text-slate-700 mb-1">5. Additional offer (৳ / pack)</label>
+                <input id="commAdditionalOfferBdt" type="number" step="0.01" min="0" inputmode="decimal" class="comm-input edit-ctl w-full px-2.5 py-1.5 text-right bg-slate-50 border border-slate-300 rounded mono text-xs font-bold" />
+                <label for="commPromoNote" class="block text-[10px] text-slate-500 mt-1">Promotion / policy note</label>
+                <input id="commPromoNote" type="text" maxlength="200" class="comm-input edit-ctl w-full px-2 py-1 border border-slate-300 rounded text-[11px]" placeholder="e.g. Eid promo till 30 Nov" />
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2 no-print">
+              <button type="button" data-act="apply-pack-all" class="admin-only text-[11px] font-bold px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100">Copy these values to all pack sizes (scaled by size)…</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-2">
+              <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 overflow-x-auto">
+                <table class="w-full min-w-[420px] text-left border-collapse text-xs">
+                  <thead><tr class="bg-slate-900 text-white text-[11px] uppercase"><th class="py-2 px-3">Profitability waterfall</th><th class="py-2 px-3 text-right">Per pack (৳)</th><th class="py-2 px-3 text-right">Batch total (৳)</th></tr></thead>
+                  <tbody id="waterfallStatementBody" class="divide-y divide-slate-200"></tbody>
+                </table>
+              </div>
+              <div class="lg:col-span-5 flex flex-col gap-3">
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="bg-white p-3 rounded-xl border border-slate-200">
+                    <span class="text-[11px] text-slate-500 block">Finished COGS / pack</span>
+                    <span id="finalFinishedCogsPerPack" class="mono text-base font-extrabold text-slate-900"></span>
+                    <span class="text-[10px] text-slate-400 block mt-0.5">Bulk <span id="bulkCostPerPack" class="mono"></span> + pack <span id="packCostPerUnit" class="mono"></span></span>
+                  </div>
+                  <div class="bg-white p-3 rounded-xl border border-slate-200">
+                    <span class="text-[11px] text-slate-500 block">Net realized price / pack</span>
+                    <span id="netRealizedPricePerPack" class="mono text-base font-extrabold text-indigo-900"></span>
+                    <span id="packYieldCount" class="text-[10px] text-slate-500 block mt-0.5"></span>
+                  </div>
+                </div>
+                <div class="bg-indigo-950 text-white p-3.5 rounded-xl shadow-sm flex items-center justify-between gap-2">
+                  <div><span class="text-[11px] text-indigo-200 font-semibold block">Gross Profit (GP)</span><span id="gpMarginPctLabel" class="text-[10px] text-indigo-300"></span></div>
+                  <div class="text-right"><span id="gpPerPackBdt" class="mono text-lg font-extrabold text-indigo-300 block"></span><span id="gpBatchTotalBdt" class="mono text-xs text-white"></span></div>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 grid grid-cols-3 gap-2 text-center">
+                  <div><span id="expMktLabel" class="text-[10px] font-bold text-amber-900 block"></span><span id="expMarketingPerPack" class="mono text-xs font-extrabold text-amber-950"></span></div>
+                  <div class="border-x border-amber-200"><span id="expOfficeLabel" class="text-[10px] font-bold text-amber-900 block"></span><span id="expOfficePerPack" class="mono text-xs font-extrabold text-amber-950"></span></div>
+                  <div><span id="expMiscLabel" class="text-[10px] font-bold text-amber-900 block"></span><span id="expMiscPerPack" class="mono text-xs font-extrabold text-amber-950"></span></div>
+                </div>
+                <div id="npBox" class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-4 rounded-xl shadow flex items-center justify-between gap-2">
+                  <div><span class="text-xs font-extrabold uppercase tracking-wider text-emerald-200 block">Net Profit (NP)</span><span id="npMarginSummaryLabel" class="text-[11px] text-emerald-100"></span></div>
+                  <div class="text-right"><span id="npPerPackBdt" class="mono text-xl font-extrabold text-emerald-300 block"></span><span id="npBatchTotalBdt" class="mono text-xs font-bold text-white"></span></div>
+                </div>
+              </div>
+            </div>
+            <p id="commercialFormulaNote" class="text-[11px] text-slate-500 leading-relaxed"></p>
+          </div>
+
+          <div>
+            <div class="flex flex-wrap items-center justify-between mb-2 gap-2">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Step 3: All pack sizes — COGS, GP &amp; Net Profit</h3>
+              <span class="text-[11px] text-slate-500 no-print">Tap a row to switch the active pack size</span>
+            </div>
+            <div class="overflow-x-auto border border-slate-200 rounded-lg">
+              <table class="w-full min-w-[860px] text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-100 border-b border-slate-200 text-[11px] uppercase text-slate-600">
+                    <th class="py-2 px-3">Pack size</th><th class="py-2 px-3 text-right">Full packs</th><th class="py-2 px-3 text-right">Leftover</th><th class="py-2 px-3 text-right">Bulk / pack</th><th class="py-2 px-3 text-right">Packaging</th><th class="py-2 px-3 text-right">COGS / pack</th><th class="py-2 px-3 text-right">TP</th><th class="py-2 px-3 text-right">GP / pack</th><th class="py-2 px-3 text-right">Expenses</th><th class="py-2 px-3 text-right">NP / pack</th><th class="py-2 px-3 text-right">Batch NP</th>
+                  </tr>
+                </thead>
+                <tbody id="multiPackComparisonBody" class="divide-y divide-slate-200"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ===================== MATERIALS VIEW ===================== -->
+    <section id="materialsView" hidden class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 no-print">
+      <div class="sticky top-0 sm:top-[4.25rem] z-20 bg-white/95 backdrop-blur -mx-5 px-5 py-3 mb-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+        <div class="text-xs text-slate-600 min-w-0">Raw material master list. Your formulation <strong id="materialsReturnName"></strong> stays exactly as you left it.</div>
+        <button type="button" data-act="close-materials" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-3 py-2 rounded-lg">↩ Return to formulation</button>
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-200">
+        <div class="min-w-0">
+          <h2 class="text-base font-bold text-slate-900">Materials — Raw Material Master List</h2>
+          <p class="text-xs text-slate-500">One record per ingredient + form/version. A material's role in a specific formulation is set on the formulation sheet.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" data-act="open-bulk" data-mode="photo" class="admin-only bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm">📷 Import from photo</button>
+          <button type="button" data-act="open-bulk" data-mode="sheet" class="admin-only bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm">📊 Import from CSV / text</button>
+        </div>
+      </div>
+
+      <form id="quickAddForm" class="mt-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 items-end text-xs" autocomplete="off">
+        <div class="lg:col-span-3"><label for="quickIngName" class="block font-semibold text-slate-700 mb-1">Ingredient name *</label><input id="quickIngName" type="text" required placeholder="e.g. Mono Sodium Phosphate" class="edit-ctl w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white" /></div>
+        <div class="lg:col-span-2"><label for="quickIngForm" class="block font-semibold text-slate-700 mb-1">Form / version</label><input id="quickIngForm" type="text" placeholder="e.g. Feed Grade, 99%" class="edit-ctl w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white" /></div>
+        <div class="lg:col-span-2"><label for="quickIngRate" class="block font-semibold text-slate-700 mb-1">Rate ৳ / kg or L</label><input id="quickIngRate" type="number" step="0.01" min="0" inputmode="decimal" placeholder="Required" class="edit-ctl w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white mono" /></div>
+        <div class="lg:col-span-1"><label for="quickIngPotency" class="block font-semibold text-slate-700 mb-1">Potency %</label><input id="quickIngPotency" type="number" step="0.01" min="0" max="100" inputmode="decimal" class="edit-ctl w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white mono" /></div>
+        <div class="lg:col-span-1"><label for="quickIngVitaminIU" class="block font-semibold text-slate-700 mb-1">IU / g</label><input id="quickIngVitaminIU" type="number" step="0.01" min="0" inputmode="decimal" placeholder="Vit A/D3" class="edit-ctl w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white mono" /></div>
+        <div class="lg:col-span-2"><label for="quickIngElementKey" class="block font-semibold text-slate-700 mb-1">Main element</label>
+          <select id="quickIngElementKey" class="edit-ctl w-full px-2 py-1.5 border border-slate-300 rounded-lg bg-white">
+            <option value="Auto">Auto-detect</option><option value="Ca">Calcium (Ca)</option><option value="P">Phosphorus (P)</option><option value="Zn">Zinc (Zn)</option><option value="Cu">Copper (Cu)</option><option value="Se">Selenium (Se)</option><option value="Mg">Magnesium (Mg)</option><option value="VitA">Vitamin A</option><option value="VitD3">Vitamin D3</option><option value="VitE">Vitamin E</option><option value="VitC">Vitamin C</option><option value="None">None / excipient</option>
+          </select></div>
+        <div class="lg:col-span-1"><button type="submit" class="admin-only w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-1.5 px-3 rounded-lg shadow">+ Add</button></div>
+        <div class="sm:col-span-2 lg:col-span-12">
+          <span class="block font-semibold text-slate-700 mb-1">Categories (one or more)</span>
+          <div id="quickIngCategories" class="flex flex-wrap gap-1.5"></div>
+        </div>
+      </form>
+
+      <div class="mt-4 flex flex-wrap items-center gap-2 text-xs">
+        <label for="materialsSearch" class="sr-only">Search materials</label>
+        <input id="materialsSearch" type="search" placeholder="Search name, alias, category…" class="flex-1 min-w-[180px] px-3 py-2 border border-slate-300 rounded-lg" />
+        <label class="flex items-center gap-1.5 font-semibold text-slate-600"><input id="materialsShowArchived" type="checkbox" class="accent-emerald-600" /> Show archived</label>
+        <span id="materialsCount" class="text-slate-500"></span>
+      </div>
+      <div class="mt-3 overflow-x-auto max-h-[70vh] overflow-y-auto border border-slate-200 rounded-lg">
+        <table class="w-full min-w-[900px] text-left border-collapse text-xs">
+          <thead class="sticky top-0 bg-slate-100 border-b border-slate-200 text-[11px] uppercase text-slate-600 z-10">
+            <tr><th class="py-2 px-2.5">Ingredient (form / version)</th><th class="py-2 px-2.5">Categories</th><th class="py-2 px-2.5">Element / function</th><th class="py-2 px-2.5 text-center">Abs.</th><th class="py-2 px-2.5 text-right">Potency</th><th class="py-2 px-2.5 text-right">IU / g</th><th class="py-2 px-2.5 text-right">Rate ৳</th><th class="py-2 px-2.5 text-center">Used in</th><th class="py-2 px-2.5 text-center">Actions</th></tr>
+          </thead>
+          <tbody id="ingredientMasterTableBody" class="divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="no-print max-w-7xl mx-auto px-4 mt-8 text-[11px] text-slate-500 flex flex-wrap gap-x-4 gap-y-1">
+    <span>Forvet · formulation development aid — verify composition, dosage and processes before commercial use.</span>
+    <span id="footerBackupInfo"></span>
+  </footer>

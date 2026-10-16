@@ -1,0 +1,294 @@
+  <!-- ===================== MODALS ===================== -->
+  <!-- Generic dialog (alerts, confirmations, prompts, choices) -->
+  <div id="uiDialog" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="uiDialogTitle">
+    <div class="modal-panel max-w-md">
+      <div class="px-5 pt-5 pb-2"><h3 id="uiDialogTitle" class="font-bold text-base text-slate-900"></h3></div>
+      <div id="uiDialogBody" class="modal-body px-5 pb-3 text-sm text-slate-700 space-y-2"></div>
+      <div id="uiDialogButtons" class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex flex-wrap justify-end gap-2"></div>
+    </div>
+  </div>
+
+  <!-- More actions (mobile) -->
+  <div id="moreSheet" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-label="More actions">
+    <div class="modal-panel max-w-md">
+      <div class="bg-slate-900 px-5 py-3 flex items-center justify-between text-white"><h3 class="font-bold text-sm">Actions</h3><button type="button" data-close class="text-slate-300 font-bold px-2" aria-label="Close">✕</button></div>
+      <div class="modal-body p-4 grid grid-cols-2 gap-2 text-xs font-bold">
+        <button type="button" data-act="create" class="admin-only bg-emerald-500 text-slate-950 rounded-lg px-3 py-3">＋ Create</button>
+        <button type="button" data-act="duplicate" class="admin-only bg-indigo-600 text-white rounded-lg px-3 py-3">⧉ Duplicate</button>
+        <button type="button" data-act="optimizer" class="admin-only bg-amber-500 text-slate-950 rounded-lg px-3 py-3">⚡ Optimizer</button>
+        <button type="button" data-act="delete-current" class="admin-only bg-rose-700 text-white rounded-lg px-3 py-3">🗑 Delete current</button>
+        <button type="button" data-act="backup" class="bg-slate-800 text-emerald-300 rounded-lg px-3 py-3">⬇️ Backup JSON</button>
+        <button type="button" data-act="restore" class="admin-only bg-slate-800 text-indigo-300 rounded-lg px-3 py-3">⬆️ Restore JSON</button>
+        <button type="button" data-act="export" data-format="xls" class="bg-emerald-100 text-emerald-900 rounded-lg px-3 py-3">XLS export</button>
+        <button type="button" data-act="export" data-format="csv" class="bg-emerald-100 text-emerald-900 rounded-lg px-3 py-3">CSV export</button>
+        <button type="button" data-act="export" data-format="pdf" class="bg-emerald-100 text-emerald-900 rounded-lg px-3 py-3">PDF / print</button>
+        <button type="button" data-act="settings" class="bg-slate-100 text-slate-800 rounded-lg px-3 py-3">⚙ Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Formulations -->
+  <div id="myFormulationsModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="myfTitle">
+    <div class="modal-panel max-w-3xl">
+      <div class="bg-slate-900 px-5 py-4 flex items-center justify-between text-white gap-3">
+        <div><h3 id="myfTitle" class="font-bold text-base">📚 My Formulations</h3><p class="text-xs text-slate-300">In Progress and Complete formulations. Deleted items can be restored.</p></div>
+        <button type="button" data-close class="text-slate-300 hover:text-white font-bold px-2" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body p-4 sm:p-5">
+        <div class="flex flex-wrap gap-2 mb-3">
+          <label for="myFormulationsSearch" class="sr-only">Search formulations</label>
+          <input id="myFormulationsSearch" type="search" placeholder="Search formulations…" class="w-full sm:flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <div class="flex rounded-lg border border-slate-300 overflow-hidden text-xs font-bold" role="tablist">
+            <button type="button" data-myf-tab="active" class="myf-tab px-3 py-2">Active</button>
+            <button type="button" data-myf-tab="deleted" class="myf-tab px-3 py-2">Recently deleted</button>
+          </div>
+        </div>
+        <div id="myFormulationsList" class="space-y-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sign in -->
+  <div id="authModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="modal-panel max-w-md">
+      <div class="bg-slate-900 px-5 py-4 flex items-center justify-between text-white"><div><h3 id="authTitle" class="font-bold text-base">🔐 Forvet sign in</h3><p class="text-xs text-slate-300">Anyone can view. Signing in as an administrator unlocks editing.</p></div><button type="button" data-close class="text-slate-300 hover:text-white font-bold px-2" aria-label="Close">✕</button></div>
+      <form id="authForm" class="modal-body p-5 space-y-3 text-sm" data-enter-submit>
+        <div id="authSignedOutFields" class="space-y-3">
+          <div><label for="authEmail" class="block text-xs font-bold text-slate-700 mb-1">Email</label><input id="authEmail" type="email" required autocomplete="username" class="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="name@example.com" /></div>
+          <div><label for="authPassword" class="block text-xs font-bold text-slate-700 mb-1">Password</label><input id="authPassword" type="password" required minlength="6" autocomplete="current-password" class="w-full px-3 py-2 border border-slate-300 rounded-lg" /></div>
+        </div>
+        <div id="authStatus" class="text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-3"></div>
+        <div class="flex flex-wrap items-center gap-2 justify-end pt-1">
+          <button type="button" id="authSignupBtn" class="mr-auto text-indigo-700 hover:underline font-bold text-xs" hidden>Create account</button>
+          <button type="button" data-close class="bg-slate-100 text-slate-700 px-3 py-2 rounded-lg font-bold text-xs">Close</button>
+          <button type="submit" id="authSubmitBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold text-xs">Sign in</button>
+          <button type="button" id="authSignOutBtn" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-2 rounded-lg font-bold text-xs" hidden>Sign out</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create -->
+  <div id="createModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="createTitle">
+    <div class="modal-panel max-w-lg">
+      <div class="bg-slate-900 px-5 py-4 flex items-center justify-between text-white"><div><h3 id="createTitle" class="font-bold text-base">Create new formulation</h3><p class="text-xs text-slate-400">Starts with an empty sheet and a Q.S. carrier row</p></div><button type="button" data-close class="text-slate-400 hover:text-white font-bold px-2" aria-label="Close">✕</button></div>
+      <form id="createForm" class="modal-body p-5 space-y-4 text-xs">
+        <div><label for="createProdName" class="block font-bold text-slate-700 mb-1">Product brand / generic name *</label><input id="createProdName" type="text" required class="w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold text-sm" /></div>
+        <fieldset><legend class="block font-bold text-slate-700 mb-1.5">Product form *</legend>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="border-2 border-slate-200 rounded-xl p-3 cursor-pointer flex items-center gap-2.5 has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50"><input type="radio" name="createFormRadio" value="Powder" class="accent-emerald-600" checked /><span><span class="font-bold text-slate-900 text-sm block">Powder (kg)</span><span class="text-[11px] text-slate-500">Sachets / premix</span></span></label>
+            <label class="border-2 border-slate-200 rounded-xl p-3 cursor-pointer flex items-center gap-2.5 has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50"><input type="radio" name="createFormRadio" value="Liquid" class="accent-emerald-600" /><span><span class="font-bold text-slate-900 text-sm block">Liquid (L)</span><span class="text-[11px] text-slate-500">Water Q.S.</span></span></label>
+          </div>
+        </fieldset>
+        <fieldset><legend class="block font-bold text-slate-700 mb-1.5">Intention *</legend>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="border-2 border-slate-200 rounded-xl p-3 cursor-pointer flex items-center gap-2.5 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50/50"><input type="radio" name="createIntentionRadio" value="Cost Effective" class="accent-amber-600" checked /><span class="font-bold text-slate-900 text-sm">💰 Cost Effective</span></label>
+            <label class="border-2 border-slate-200 rounded-xl p-3 cursor-pointer flex items-center gap-2.5 has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50/50"><input type="radio" name="createIntentionRadio" value="Performance" class="accent-indigo-600" /><span class="font-bold text-slate-900 text-sm">🚀 Performance</span></label>
+          </div>
+        </fieldset>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label for="createBatchSize" class="block font-bold text-slate-700 mb-1">Batch size (kg / L)</label><input id="createBatchSize" type="number" min="0.01" step="0.01" value="100" list="batchSizeList" required class="w-full px-3 py-2 border border-slate-300 rounded-lg font-bold mono" /></div>
+          <div><label for="createInitialStatus" class="block font-bold text-slate-700 mb-1">Status</label><select id="createInitialStatus" class="w-full px-3 py-2 border border-slate-300 rounded-lg font-bold bg-white"><option value="In Progress" selected>⏳ In Progress</option><option value="Complete">✅ Complete</option></select></div>
+        </div>
+        <div class="pt-3 border-t border-slate-200 flex justify-end gap-2">
+          <button type="button" data-close class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow">Create formulation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Import formulation (input → review → commit) -->
+  <div id="importFormulaModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="importTitle">
+    <div class="modal-panel max-w-4xl">
+      <div class="bg-slate-900 px-5 py-4 flex items-center justify-between text-white gap-3"><div><h3 id="importTitle" class="font-bold text-base">📥 Import a formulation</h3><p class="text-xs text-slate-400">Creates a new formulation. Nothing existing is overwritten.</p></div><button type="button" data-close class="text-slate-400 hover:text-white font-bold px-2" aria-label="Close">✕</button></div>
+      <div class="modal-body p-5 space-y-4 text-xs">
+        <div id="importStepInput" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="border-2 border-dashed border-emerald-300 bg-emerald-50/50 rounded-xl p-3.5 text-center cursor-pointer"><span class="font-bold text-emerald-950 block mb-1">📊 CSV / TSV / text file</span><input id="importSheetFile" type="file" accept=".csv,.txt,.tsv,text/plain,text/csv" class="text-[11px] mx-auto block max-w-full" /></label>
+            <label class="border-2 border-dashed border-indigo-300 bg-indigo-50/50 rounded-xl p-3.5 text-center cursor-pointer"><span class="font-bold text-indigo-950 block mb-1">📷 Photo / screenshot (OCR)</span><input id="importPhotoFile" type="file" accept="image/*" class="text-[11px] mx-auto block max-w-full" /><span id="importOcrStatus" class="block text-[10px] text-slate-500 mt-1">OCR gives a draft. Check names, decimals and units.</span></label>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2"><label for="importName" class="block font-bold text-slate-700 mb-1">New formulation name</label><input id="importName" type="text" class="w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold" placeholder="Imported formulation" /></div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label for="importForm" class="block font-bold text-slate-700 mb-1">Form</label><select id="importForm" class="w-full px-2 py-2 border border-slate-300 rounded-lg bg-white"><option value="Liquid">Liquid</option><option value="Powder">Powder</option></select></div>
+              <div><label for="importBatch" class="block font-bold text-slate-700 mb-1">Batch</label><input id="importBatch" type="number" min="0.01" step="0.01" value="100" class="w-full px-2 py-2 border border-slate-300 rounded-lg mono" /></div>
+            </div>
+          </div>
+          <div>
+            <label for="importFormulaTextarea" class="font-bold text-slate-700 block mb-1">One ingredient per line: <code>Name, Quantity, Unit (kg/g/L/ml — optional), Rate ৳ (optional)</code></label>
+            <textarea id="importFormulaTextarea" rows="7" class="w-full p-3 border border-slate-300 rounded-lg mono text-xs" placeholder="Calcium Lactate Pentahydrate, 14, kg, 390&#10;MSP, 6, kg&#10;Vitamin D3 500, 45, g&#10;Methyl Paraben Sodium, 80, g"></textarea>
+            <p class="text-[10px] text-slate-500 mt-1">No unit = kg for powder, L for liquid. Water / Q.S. lines are skipped — the Q.S. carrier is calculated automatically.</p>
+          </div>
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-200"><button type="button" data-close class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold">Cancel</button><button type="button" id="importReviewBtn" class="px-4 py-2 rounded-lg bg-slate-900 text-white font-bold">Review matches</button></div>
+        </div>
+        <div id="importStepReview" hidden class="space-y-3">
+          <div id="importReviewSummary" class="text-xs"></div>
+          <div class="overflow-x-auto border border-slate-200 rounded-lg"><table class="w-full min-w-[720px] text-left border-collapse text-xs"><thead class="bg-slate-100 text-[11px] uppercase text-slate-600"><tr><th class="py-2 px-2">Imported line</th><th class="py-2 px-2 text-right">Qty (main unit)</th><th class="py-2 px-2">Match status</th><th class="py-2 px-2">Use material</th></tr></thead><tbody id="importReviewBody" class="divide-y divide-slate-200"></tbody></table></div>
+          <div class="flex flex-wrap justify-end gap-2 pt-2 border-t border-slate-200"><button type="button" id="importBackBtn" class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold">← Back</button><button type="button" id="importCommitBtn" class="admin-only px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow">Create formulation</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analyze label → draft formulation -->
+  <div id="analyzeModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="analyzeTitle">
+    <div class="modal-panel max-w-2xl">
+      <div class="bg-indigo-900 px-5 py-4 flex items-center justify-between text-white gap-3"><div><h3 id="analyzeTitle" class="font-bold text-base">🔬 Draft a formulation from label claims</h3><p class="text-xs text-indigo-200">Enter (or OCR) the declared amounts per 1 ml / 1 g. Forvet picks materials from your master list.</p></div><button type="button" data-close class="text-indigo-200 hover:text-white font-bold px-2" aria-label="Close">✕</button></div>
+      <div class="modal-body p-5 space-y-4 text-xs">
+        <label class="block border-2 border-dashed border-indigo-300 bg-indigo-50/50 rounded-xl p-4 text-center cursor-pointer"><span class="font-bold text-indigo-950 text-sm block">📷 Label photo or text file</span><input id="analyzeFile" type="file" accept="image/*,.txt,.csv" class="text-xs mx-auto block max-w-full mt-1" /><span id="analyzeOcrStatus" class="block text-[10px] text-slate-500 mt-1">Extracted text must be reviewed before use.</span></label>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2"><label for="analyzeRefName" class="block font-bold text-slate-700 mb-1">Reference product name</label><input id="analyzeRefName" type="text" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg font-semibold" /></div>
+          <div><label for="analyzeRefForm" class="block font-bold text-slate-700 mb-1">Form &amp; basis</label><select id="analyzeRefForm" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg bg-white"><option value="Liquid">Liquid — per 1 ml</option><option value="Powder">Powder — per 1 g</option></select></div>
+        </div>
+        <div><label for="analyzeLiteratureTextarea" class="font-bold text-slate-700 block mb-1">Claims, one per line: <code>Active, amount, unit (mg / mcg / g / IU)</code></label>
+          <textarea id="analyzeLiteratureTextarea" rows="6" class="w-full p-3 border border-slate-300 rounded-lg mono text-xs" placeholder="Calcium, 20, mg&#10;Phosphorus, 10, mg&#10;Vitamin D3, 2000, IU&#10;Zinc, 2.5, mg"></textarea></div>
+        <div id="analyzePreview" class="text-xs"></div>
+        <div class="flex flex-wrap justify-end gap-2 pt-2 border-t border-slate-200"><button type="button" id="analyzePreviewBtn" class="px-4 py-2 rounded-lg bg-slate-100 text-slate-800 font-bold">Preview materials</button><button type="button" id="analyzeGenerateBtn" class="admin-only px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold shadow">Create draft formulation</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compare -->
+  <div id="compareModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="compareTitle">
+    <div class="modal-panel max-w-5xl">
+      <div class="bg-teal-900 px-5 py-4 flex items-center justify-between text-white gap-3"><div><h3 id="compareTitle" class="font-bold text-base">⚖️ Compare with a competitor product</h3><p class="text-xs text-teal-200">Label-declared values vs your calculated formulation. Extracted text must be reviewed.</p></div><button type="button" data-close class="text-teal-200 hover:text-white font-bold px-2" aria-label="Close">✕</button></div>
+      <div class="modal-body p-5 space-y-4 text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <div class="md:col-span-7 space-y-2.5 md:border-r md:border-slate-200 md:pr-4 min-w-0">
+            <h4 class="font-extrabold text-slate-800 text-[11px] uppercase tracking-wider">A. Competitor product (label)</h4>
+            <label class="block"><span class="block font-semibold text-slate-600 mb-0.5">Label photo or text file (optional)</span><input id="competitorFile" type="file" accept="image/*,.txt,.csv" class="text-[11px] w-full" /><span id="competitorOcrStatus" class="block mt-1 text-[10px] text-slate-500">No file read yet.</span></label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div class="col-span-2"><label for="compExtName" class="block font-semibold text-slate-600 mb-0.5">Product name</label><input id="compExtName" type="text" class="w-full px-2.5 py-1.5 border border-slate-300 rounded bg-white font-bold" /></div>
+              <div><label for="compExtBasis" class="block font-semibold text-slate-600 mb-0.5">Declared per</label><input id="compExtBasis" type="number" min="0.01" step="0.01" value="1" class="w-full px-2 py-1.5 border border-slate-300 rounded bg-white mono" /></div>
+              <div><label for="compExtBasisUnit" class="block font-semibold text-slate-600 mb-0.5">unit</label><select id="compExtBasisUnit" class="w-full px-1.5 py-1.5 border border-slate-300 rounded bg-white"><option value="ml">ml</option><option value="g">g</option><option value="L">L</option><option value="kg">kg</option></select></div>
+              <div><label for="compExtPackSize" class="block font-semibold text-slate-600 mb-0.5">Pack size</label><input id="compExtPackSize" type="number" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded bg-white mono" placeholder="e.g. 1" /></div>
+              <div><label for="compExtPackUnit" class="block font-semibold text-slate-600 mb-0.5">unit</label><select id="compExtPackUnit" class="w-full px-1.5 py-1.5 border border-slate-300 rounded bg-white"><option value="L">L</option><option value="ml">ml</option><option value="kg">kg</option><option value="g">g</option></select></div>
+              <div class="col-span-2"><label for="compExtPrice" class="block font-semibold text-slate-600 mb-0.5">Retail price / pack (৳)</label><input id="compExtPrice" type="number" min="0" step="0.01" class="w-full px-2.5 py-1.5 border border-slate-300 rounded bg-white mono font-bold" placeholder="optional" /></div>
+            </div>
+            <div><label for="compExtCompTextarea" class="block font-semibold text-slate-600 mb-0.5">Declared composition, one per line: <code>Active, amount, unit</code></label>
+              <textarea id="compExtCompTextarea" rows="6" class="w-full p-2 border border-slate-300 rounded mono text-[11px] bg-white" placeholder="Calcium, 24, mg&#10;Phosphorus, 18, mg&#10;Vitamin D3, 600, IU&#10;Zinc, 1.5, mg"></textarea></div>
+          </div>
+          <div class="md:col-span-5 space-y-2.5 min-w-0">
+            <h4 class="font-extrabold text-emerald-900 text-[11px] uppercase tracking-wider">B. Our formulation</h4>
+            <div><label for="compOurProductSelect" class="block font-semibold text-slate-600 mb-0.5">Saved formulation</label><select id="compOurProductSelect" class="w-full px-2.5 py-1.5 border border-emerald-400 rounded bg-white font-bold text-slate-900"></select></div>
+            <div><label for="compOurPack" class="block font-semibold text-slate-600 mb-0.5">Our pack (for price)</label><select id="compOurPack" class="w-full px-2.5 py-1.5 border border-slate-300 rounded bg-white"></select></div>
+            <div id="compSuggestedMatch" class="text-[11px] text-teal-900"></div>
+            <div id="compSummaryBox" class="bg-white p-3 rounded-lg border border-slate-200 space-y-1.5 text-xs"></div>
+          </div>
+        </div>
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+          <table class="w-full min-w-[680px] text-left border-collapse text-xs">
+            <thead><tr class="bg-slate-900 text-white text-[11px] uppercase"><th class="py-2.5 px-3">Active (per 1 ml / 1 g)</th><th id="compColHeaderExt" class="py-2.5 px-3 text-right">Competitor (declared)</th><th id="compColHeaderOur" class="py-2.5 px-3 text-right">Ours (calculated)</th><th class="py-2.5 px-3 text-right">Difference</th><th class="py-2.5 px-3">Note</th></tr></thead>
+            <tbody id="compTableBody" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit material -->
+  <div id="editIngredientModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="editIngTitle">
+    <div class="modal-panel max-w-xl">
+      <div class="bg-slate-900 px-5 py-4 flex items-center justify-between text-white"><h3 id="editIngTitle" class="font-bold text-base">✏️ Edit material</h3><button type="button" data-close class="text-slate-400 hover:text-white font-bold px-2" aria-label="Close">✕</button></div>
+      <form id="editIngredientForm" class="modal-body p-5 space-y-3 text-xs">
+        <input type="hidden" id="editIngId" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div><label for="editIngName" class="block font-bold text-slate-700 mb-1">Ingredient name *</label><input id="editIngName" type="text" required class="w-full px-3 py-1.5 border border-slate-300 rounded-lg font-semibold" /></div>
+          <div><label for="editIngForm" class="block font-bold text-slate-700 mb-1">Form / version</label><input id="editIngForm" type="text" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg" placeholder="e.g. Feed Grade, 99%" /></div>
+        </div>
+        <div><label for="editIngAliases" class="block font-bold text-slate-700 mb-1">Aliases / alternative spellings (comma separated)</label><input id="editIngAliases" type="text" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg" placeholder="e.g. MSP, Monosodium phosphate" /></div>
+        <div><span class="block font-bold text-slate-700 mb-1">Categories</span><div id="editIngCategories" class="flex flex-wrap gap-1.5"></div></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div><label for="editIngGroup" class="block font-bold text-slate-700 mb-1">Element / function group</label><input id="editIngGroup" type="text" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg" /></div>
+          <div><label for="editIngActive" class="block font-bold text-slate-700 mb-1">Active moiety label</label><input id="editIngActive" type="text" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg" /></div>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div><label for="editIngRate" class="block font-bold text-slate-700 mb-1">Rate ৳ / kg or L</label><input id="editIngRate" type="number" step="0.01" min="0" required class="w-full px-2 py-1.5 border border-slate-300 rounded-lg mono font-bold" /></div>
+          <div><label for="editIngPotency" class="block font-bold text-slate-700 mb-1">Potency %</label><input id="editIngPotency" type="number" step="0.01" min="0" max="100" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg mono font-bold" /></div>
+          <div><label for="editIngAbsorption" class="block font-bold text-slate-700 mb-1">Absorption %</label><input id="editIngAbsorption" type="number" step="0.01" min="0" max="100" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg mono font-bold" /></div>
+          <div><label for="editIngVitaminIU" class="block font-bold text-slate-700 mb-1">Supplier IU / g</label><input id="editIngVitaminIU" type="number" step="0.01" min="0" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg mono font-bold" placeholder="Vit A / D3" /></div>
+        </div>
+        <div><label for="editIngElemental" class="block font-bold text-slate-700 mb-1">Elemental / active content (one per line: <code>Element name, % w/w</code>)</label><textarea id="editIngElemental" rows="3" class="w-full p-2 border border-slate-300 rounded-lg mono text-[11px]" placeholder="Elemental Calcium (Ca), 13"></textarea></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div><label for="editIngSpecies" class="block font-bold text-slate-700 mb-1">Species rule</label><select id="editIngSpecies" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg bg-white"><option value="NONE">No restriction</option><option value="NO_POULTRY_AQUA">Not for poultry / fish &amp; shrimp</option><option value="CAUTION_AQUA">Caution for fish &amp; shrimp</option></select></div>
+          <div><label for="editIngIndication" class="block font-bold text-slate-700 mb-1">Indication text</label><input id="editIngIndication" type="text" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg" /></div>
+        </div>
+        <div><label for="editIngSupplier" class="block font-bold text-slate-700 mb-1">Supplier / specification note</label><input id="editIngSupplier" type="text" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg" /></div>
+        <label class="flex items-center gap-2 font-semibold text-slate-700"><input id="editIngConfirmed" type="checkbox" class="accent-emerald-600" /> Rate &amp; potency confirmed (clears the * estimate flag)</label>
+        <div class="pt-3 border-t border-slate-200 flex justify-end gap-2"><button type="button" data-close class="px-4 py-1.5 rounded-lg bg-slate-100 text-slate-700 font-semibold">Cancel</button><button type="submit" class="admin-only px-4 py-1.5 rounded-lg bg-emerald-600 text-white font-bold shadow">Save material</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Optimizer -->
+  <div id="swapModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="swapModalTitle">
+    <div class="modal-panel max-w-2xl">
+      <div class="bg-amber-500 px-5 py-4 flex items-center justify-between text-slate-950"><div><h3 id="swapModalTitle" class="font-bold text-base">Ingredient swap suggestions</h3><p class="text-xs text-slate-900">Same element group — cheaper (Cost Effective) or better absorbed (Performance). Check quantities after swapping: potency can differ.</p></div><button type="button" data-close class="font-bold text-sm px-2" aria-label="Close">✕</button></div>
+      <div id="swapModalBody" class="modal-body p-5 space-y-3 text-xs"></div>
+      <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex flex-wrap justify-end gap-2"><button type="button" id="applyAllSwapsBtn" class="admin-only bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow">Apply all swaps</button><button type="button" data-close class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs px-4 py-2 rounded-lg">Close</button></div>
+    </div>
+  </div>
+
+  <!-- Bulk materials import (input → review → commit) -->
+  <div id="bulkImportModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="bulkTitle">
+    <div class="modal-panel max-w-4xl">
+      <div class="bg-indigo-900 px-5 py-4 flex items-center justify-between text-white gap-3"><div><h3 id="bulkTitle" class="font-bold text-base">Import materials</h3><p class="text-xs text-indigo-200">Existing materials keep their master name, rate and specification.</p></div><button type="button" data-close class="text-indigo-200 hover:text-white font-bold px-2" aria-label="Close">✕</button></div>
+      <div class="modal-body p-5 space-y-4 text-xs">
+        <div id="bulkStepInput" class="space-y-4">
+          <label id="bulkPhotoBox" class="block border-2 border-dashed border-indigo-300 bg-indigo-50/50 rounded-xl p-4 text-center cursor-pointer"><span class="text-sm font-bold text-indigo-950 block">📷 Supplier price list photo / screenshot</span><input id="bulkPhotoFile" type="file" accept="image/*" class="text-xs mx-auto block max-w-full mt-1" /><span id="bulkOcrStatus" class="block text-[10px] text-slate-500 mt-1">OCR gives a draft — review each line.</span></label>
+          <label id="bulkSheetBox" class="block border-2 border-dashed border-emerald-300 bg-emerald-50/50 rounded-xl p-4 text-center cursor-pointer"><span class="text-sm font-bold text-emerald-950 block">📊 CSV / TSV / text file</span><input id="bulkSheetFile" type="file" accept=".csv,.txt,.tsv,text/plain,text/csv" class="text-xs mx-auto block max-w-full mt-1" /></label>
+          <div><label for="bulkImportTextarea" class="font-bold text-slate-700 block mb-1">One material per line: <code>Name, Rate ৳, Potency % (optional)</code></label><textarea id="bulkImportTextarea" rows="6" class="w-full p-3 border border-slate-300 rounded-lg mono text-xs" placeholder="Magnesium Sulfate Heptahydrate, 65, 9.8&#10;DL-Methionine Feed Grade, 490, 99"></textarea></div>
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-200"><button type="button" data-close class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold">Cancel</button><button type="button" id="bulkReviewBtn" class="px-4 py-2 rounded-lg bg-slate-900 text-white font-bold">Review matches</button></div>
+        </div>
+        <div id="bulkStepReview" hidden class="space-y-3">
+          <div id="bulkReviewSummary"></div>
+          <div class="overflow-x-auto border border-slate-200 rounded-lg"><table class="w-full min-w-[720px] text-left border-collapse text-xs"><thead class="bg-slate-100 text-[11px] uppercase text-slate-600"><tr><th class="py-2 px-2">Imported line</th><th class="py-2 px-2 text-right">Rate ৳</th><th class="py-2 px-2 text-right">Potency</th><th class="py-2 px-2">Match status</th><th class="py-2 px-2">Action</th></tr></thead><tbody id="bulkReviewBody" class="divide-y divide-slate-200"></tbody></table></div>
+          <div class="flex flex-wrap justify-end gap-2 pt-2 border-t border-slate-200"><button type="button" id="bulkBackBtn" class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold">← Back</button><button type="button" id="bulkCommitBtn" class="admin-only px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow">Add selected materials</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sync status & conflicts -->
+  <div id="syncModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="syncTitle">
+    <div class="modal-panel max-w-2xl">
+      <div class="bg-slate-900 px-5 py-4 flex items-center justify-between text-white"><div><h3 id="syncTitle" class="font-bold text-base">Storage &amp; sync</h3><p class="text-xs text-slate-300">Where your data is saved, and anything waiting to upload.</p></div><button type="button" data-close class="text-slate-300 hover:text-white font-bold px-2" aria-label="Close">✕</button></div>
+      <div id="syncModalBody" class="modal-body p-5 space-y-3 text-xs"></div>
+    </div>
+  </div>
+
+  <!-- Revision history -->
+  <div id="historyModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+    <div class="modal-panel max-w-2xl">
+      <div class="bg-slate-900 px-5 py-4 flex items-center justify-between text-white"><div><h3 id="historyTitle" class="font-bold text-base">Revision history</h3><p id="historySubtitle" class="text-xs text-slate-300"></p></div><button type="button" data-close class="text-slate-300 hover:text-white font-bold px-2" aria-label="Close">✕</button></div>
+      <div id="historyBody" class="modal-body p-5 space-y-2 text-xs"></div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div id="settingsModal" class="modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-panel max-w-lg">
+      <div class="bg-slate-900 px-5 py-4 flex items-center justify-between text-white"><h3 id="settingsTitle" class="font-bold text-base">⚙ Settings &amp; cost assumptions</h3><button type="button" data-close class="text-slate-300 hover:text-white font-bold px-2" aria-label="Close">✕</button></div>
+      <form id="settingsForm" class="modal-body p-5 space-y-4 text-xs">
+        <fieldset class="grid grid-cols-2 gap-3">
+          <legend class="font-bold text-slate-800 mb-1 col-span-2">Shared cost assumptions (all formulations)</legend>
+          <label class="block"><span class="font-semibold text-slate-700">Manufacturing overhead ৳ per kg/L</span><input id="setOverhead" type="number" min="0" step="0.01" class="edit-ctl w-full mt-1 px-2 py-1.5 border border-slate-300 rounded-lg mono" /></label>
+          <label class="block"><span class="font-semibold text-slate-700">Marketing expense % of GP</span><input id="setExpMkt" type="number" min="0" max="100" step="0.01" class="edit-ctl w-full mt-1 px-2 py-1.5 border border-slate-300 rounded-lg mono" /></label>
+          <label class="block"><span class="font-semibold text-slate-700">Office expense % of GP</span><input id="setExpOffice" type="number" min="0" max="100" step="0.01" class="edit-ctl w-full mt-1 px-2 py-1.5 border border-slate-300 rounded-lg mono" /></label>
+          <label class="block"><span class="font-semibold text-slate-700">Misc. expense % of GP</span><input id="setExpMisc" type="number" min="0" max="100" step="0.01" class="edit-ctl w-full mt-1 px-2 py-1.5 border border-slate-300 rounded-lg mono" /></label>
+        </fieldset>
+        <div class="flex justify-end"><button type="submit" class="admin-only px-4 py-2 rounded-lg bg-emerald-600 text-white font-bold">Save assumptions</button></div>
+        <div class="border-t border-slate-200 pt-3 space-y-2">
+          <h4 class="font-bold text-slate-800">Data</h4>
+          <p id="settingsDataInfo" class="text-slate-600"></p>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" data-act="backup" class="px-3 py-2 rounded-lg bg-slate-900 text-emerald-300 font-bold">⬇️ Download backup</button>
+            <button type="button" data-act="reset-defaults" class="admin-only px-3 py-2 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 font-bold">Reset to factory defaults…</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="no-print fixed left-1/2 -translate-x-1/2 bottom-20 sm:bottom-6 z-[60] bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-lg max-w-[90vw]" role="status" aria-live="polite" hidden></div>
