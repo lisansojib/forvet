@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* ---------- App bar ---------- */
+  .appbar-brand-mark { @apply w-8 h-8 shrink-0 rounded-lg bg-brand-600 text-white flex items-center justify-center text-[13px] font-bold tracking-tight shadow-sm; }
+
+  .nav-tab { @apply relative inline-flex items-center gap-1.5 h-14 px-3 text-[13px] font-medium text-ink-500 hover:text-ink-900 transition-colors; }
+  .nav-tab::after { content: ''; @apply absolute left-3 right-3 bottom-0 h-0.5 rounded-full bg-transparent transition-colors; }
+  .nav-tab.is-active { @apply text-ink-900; }
+  .nav-tab.is-active::after { @apply bg-brand-600; }
+  .nav-tab svg { @apply w-4 h-4 opacity-70; }
+  .nav-tab.is-active svg { @apply opacity-100 text-brand-600; }
+
+  /* ---------- Buttons ---------- */
+  .btn { @apply inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-md text-[13px] font-medium whitespace-nowrap transition-colors select-none; }
+  .btn svg { @apply w-4 h-4 shrink-0; }
+  .btn-primary { @apply bg-brand-600 text-white hover:bg-brand-700 shadow-sm; }
+  .btn-secondary { @apply bg-white text-ink-800 border border-ink-200 hover:bg-ink-50 hover:border-ink-300 shadow-sm; }
+  .btn-ghost { @apply text-ink-600 hover:bg-ink-100 hover:text-ink-900; }
+  .btn-icon { @apply w-8 px-0; }
+  .btn[disabled] { @apply opacity-50; }
+
+  .count-badge { @apply min-w-[18px] h-[18px] px-1 rounded-full bg-brand-600 text-white text-[10px] font-semibold leading-[18px] text-center; }
+
+  /* ---------- Menus ---------- */
+  .menu { @apply relative; }
+  .menu-pop { @apply absolute right-0 top-full mt-1.5 z-40 min-w-[220px] rounded-lg bg-white border border-ink-200 shadow-menu py-1.5; }
+  .menu-item { @apply w-full flex items-center gap-2.5 px-3 py-2 text-left text-[13px] text-ink-700 hover:bg-ink-50 hover:text-ink-900; }
+  .menu-item svg { @apply w-4 h-4 text-ink-400 shrink-0; }
+  .menu-item .hint { @apply ml-auto text-[11px] text-ink-400; }
+  .menu-item.is-danger { @apply text-red-600 hover:bg-red-50 hover:text-red-700; }
+  .menu-item.is-danger svg { @apply text-red-500; }
+  .menu-item[disabled] { @apply opacity-40 hover:bg-transparent; }
+  .menu-sep { @apply my-1.5 border-t border-ink-100; }
+  .menu-label { @apply px-3 pt-1 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink-400; }
+
+  /* ---------- Formulation picker ---------- */
+  .picker { @apply h-8 pl-3 pr-8 rounded-md border border-ink-200 bg-white text-[13px] font-medium text-ink-900 shadow-sm appearance-none hover:border-ink-300 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2367758d'%3E%3Cpath d='M5.2 7.6a.75.75 0 0 1 1.06.02L10 11.5l3.74-3.88a.75.75 0 1 1 1.08 1.04l-4.28 4.44a.75.75 0 0 1-1.08 0L5.18 8.66a.75.75 0 0 1 .02-1.06Z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .5rem center; background-size: 16px; }
+
+  /* ---------- Status pill (sync) ---------- */
+  .cloud-state { @apply inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-ink-200 bg-white text-[12px] font-medium text-ink-600 whitespace-nowrap cursor-pointer hover:bg-ink-50; }
+  .cloud-state .dot { @apply w-1.5 h-1.5 rounded-full bg-ink-400; }
+  .cloud-state.is-ok .dot { @apply bg-emerald-500; }
+  .cloud-state.is-warn .dot { @apply bg-amber-500; }
+  .cloud-state.is-err { @apply border-red-200 bg-red-50 text-red-700; }
+  .cloud-state.is-err .dot { @apply bg-red-500; }
+  .cloud-state.is-info .dot { @apply bg-brand-500 animate-pulse; }
+
+  /* ---------- Account ---------- */
+  .avatar { @apply w-7 h-7 rounded-full bg-brand-100 text-brand-700 text-[11px] font-semibold flex items-center justify-center; }
+
+  /* ---------- Mobile nav ---------- */
+  .mnav-btn { @apply flex-1 flex flex-col items-center gap-0.5 rounded-md px-1 py-1.5 text-[11px] font-medium text-ink-500; }
+  .mnav-btn svg { @apply w-5 h-5; }
+  .mnav-btn.is-active { @apply text-brand-700 bg-brand-50; }
+
+  /* ---------- Profit & loss statement ---------- */
+  .pl-card { @apply bg-white rounded-xl border border-ink-200 shadow-sm; }
+  .pl-table { @apply text-left border-collapse text-[13px]; }
+  .pl-table thead th { @apply whitespace-nowrap px-4 py-2.5 bg-ink-50 border-b border-ink-200 text-[11px] font-semibold uppercase tracking-wider text-ink-500; }
+  .pl-table thead th:first-child { @apply rounded-tl-xl; }
+  .pl-table thead th:last-child { @apply rounded-tr-xl; }
+  .pl-table td { @apply px-4 py-[7px] align-baseline border-b border-ink-100; }
+  .pl-table td.num { @apply text-right font-mono whitespace-nowrap tabular-nums; }
+  .pl-table td.pct { @apply text-right font-mono whitespace-nowrap text-[11px] text-ink-400 tabular-nums; }
+  .pl-table .pl-detail { @apply ml-2 text-[11px] text-ink-400; }
+  .pl-line td { @apply text-ink-700; }
+  .pl-less td:first-child { @apply !pl-8 text-ink-600; }
+  .pl-less td.num { @apply text-ink-500; }
+  .pl-subtotal td { @apply bg-ink-50 font-semibold text-ink-900 border-t border-ink-200; }
+  .pl-subtotal td.pct { @apply font-normal; }
+  .pl-total td { @apply font-bold text-ink-950 text-[14px] border-t-2 border-ink-300 border-b-0 py-3; }
+  .pl-total td.pct { @apply font-normal text-[11px]; }
+  .pl-total td:first-child { @apply rounded-bl-xl; }
+  .pl-total td:last-child { @apply rounded-br-xl; }
+  .is-neg { @apply !text-red-600; }
+  .is-pos { @apply !text-emerald-700; }
+
+  .pl-kicker { @apply text-[11px] font-medium uppercase tracking-wider text-ink-500; }
+  .pl-hero { @apply text-[28px] leading-tight font-semibold tracking-tight text-ink-900 mt-1; }
+  .pl-tile { @apply bg-white rounded-xl border border-ink-200 shadow-sm p-3.5; }
+  .pl-value { @apply text-[18px] font-semibold text-ink-900 mt-1 tabular-nums; }
+  .pl-sub { @apply text-[11px] text-ink-500 mt-0.5; }
+  .pl-chip { @apply shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border; }
+  .pl-chip.is-loss { @apply bg-red-50 text-red-700 border-red-200; }
+  .pl-chip.is-profit { @apply bg-emerald-50 text-emerald-700 border-emerald-200; }
+  .pl-chip.is-even { @apply bg-ink-50 text-ink-600 border-ink-200; }
+  .pl-bar { @apply flex h-2.5 w-full rounded-full overflow-hidden bg-ink-100; }
+  .pl-bar > span { @apply h-full; }
+  .pl-bar > span + span { @apply border-l-2 border-white; }
+  .pl-swatch { @apply inline-block w-2 h-2 rounded-sm mr-1.5 align-middle; }
+  .pl-howto { @apply text-[11px] text-ink-500; }
+  .pl-howto summary { @apply cursor-pointer select-none text-ink-600 font-medium hover:text-ink-900 w-fit; }
+  .pl-howto p { @apply mt-1.5 leading-relaxed max-w-4xl; }
+}

@@ -147,3 +147,12 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Forvet
+build/
+dist/
+.DS_Store
+forvet-repo.zip
+old/
+.wrangler/
+Claude outputs/
