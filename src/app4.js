@@ -646,7 +646,10 @@ function wireEvents() {
     if (modeEl && modeEl.classList.contains('mode-btn')) { setMode(modeEl.dataset.mode); return; }
     const tab = ev.target.closest('[data-myf-tab]'); if (tab) { UI.myfTab = tab.dataset.myfTab; saveUI(); renderMyFormulations(); return; }
     const pr = ev.target.closest('[data-pack-row]'); if (pr) { setPackKey(pr.dataset.packRow); return; }
-    if (ev.target.classList.contains('modal-backdrop') && ev.target.id !== 'uiDialog') closeModal(ev.target.id);
+    // Dialogs close only via their ✕ / Close buttons or Esc. Clicking the backdrop closed them by accident
+    // (e.g. selecting text in a field and releasing the mouse outside the panel). Only the mobile action sheet
+    // keeps tap-outside-to-close.
+    if (ev.target.id === 'moreSheet') closeModal('moreSheet');
   });
   document.addEventListener('keydown', ev => {
     if (onMenuKey(ev)) return;
