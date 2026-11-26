@@ -1,8 +1,8 @@
 # Forvet — deployment guide
 
 Forvet is a static web app: `index.html` + `config.js`. No server code. Data lives either in each
-browser (**local mode**) or in Supabase (**cloud mode**: anyone with the link can view, only
-administrators can edit).
+browser (**local mode**) or in Supabase (**cloud mode**: shared by every device; sign-in required,
+members can view, administrators can edit).
 
 ## Files
 | File | Purpose |
@@ -12,7 +12,7 @@ administrators can edit).
 | `supabase/forvet_schema.sql` | Tables, Row Level Security, revision history. Safe to re-run. |
 | `src/` | Source: `head.html`, `body.html`, `modals.html`, `app1–4.js`, `tw.css` (design components). |
 | `tailwind.config.js` | Design tokens: `brand` (primary blue) and `ink` (neutrals). |
-| `tests/` | Playwright tests (`t_local.py` against `dist/` on port 8080; `t_cloud.py` needs Postgres + PostgREST). |
+| `tests/` | Playwright: `t_local.py` (local mode, :8080), `t_auth.py` (sign-in screen against `tests/mock/mock-supabase.js`, :8081), `t_cloud.py` (needs Postgres + PostgREST). SQL: `rls_test.sql` checks the security rules (run after `mock_supabase.sql` + the schema). |
 | `docs/` | Design notes and plans (e.g. `sign-in-plan.md`). |
 
 ## Build
@@ -28,28 +28,40 @@ Run the build, then open `dist/index.html` through any static server (e.g. `npx 
 With an empty `config.js`, the app runs in local mode: anyone using the browser can edit, and
 data stays in that browser. Download backups regularly (toolbar ⋯ → Download backup).
 
-## 2. Set up Supabase (cloud mode)
-1. Create a project at supabase.com.
-2. SQL Editor → paste `supabase/forvet_schema.sql` → Run.
-3. Authentication → Users → **Add user** (email + password, tick *Auto Confirm*).
-4. SQL Editor, replacing the email:
+## 2. Set up Supabase (cloud mode — shared data, sign-in required)
+`config.js` already points at the Forvet project and has `requireSignIn: true`, so the app shows a
+sign-in screen before anything loads. Only accounts you add can see data.
+
+1. Supabase → **SQL Editor** → New query → paste all of `supabase/forvet_schema.sql` → **Run**.
+   (Safe to re-run; it also upgrades the older public-read version.)
+2. **Authentication → Sign In / Providers** → turn **off** "Allow new users to sign up".
+3. **Authentication → Users → Add user** → your email + a password, tick **Auto Confirm User**.
+4. SQL Editor, replacing the email — makes you an administrator (can edit):
    ```sql
    insert into public.forvet_admins (user_id, note)
    select id, 'owner' from auth.users where email = 'you@example.com'
    on conflict do nothing;
    ```
-5. Project Settings → API: copy the **Project URL** and the **anon / publishable** key into `config.js`.
-   Never use the `service_role` / secret key in the browser.
-6. Authentication → URL Configuration: set *Site URL* to your deployed address.
-7. Open the app, click **Sign in** (top right), sign in. Because the cloud is empty, Forvet offers to
-   upload this browser's data — accept once. Every later change syncs automatically.
+   Read-only colleague: create their user (step 3), then the same insert into `public.forvet_viewers`.
+5. **Authentication → URL Configuration**: *Site URL* = your GitHub Pages address
+   (e.g. `https://<user>.github.io/forvet/`) and add the same address under *Redirect URLs*
+   (needed for "Forgot password?" links).
+6. Open the site, sign in. The cloud is empty, so Forvet offers to upload this browser's data.
+   - On the browser/PC that has your real data: accept.
+   - On a new site/browser that only has the samples: choose **Cancel**, then ⋯ → **Restore from backup**
+     with a JSON backup downloaded from your old copy. Every later change syncs automatically.
 
-Adding another editor: create the user (step 3) and insert them into `forvet_admins` (step 4).
-Anyone else (signed in or not) can only view. This is enforced by the database, not the UI.
+Signed-in users who are in neither table see a "No access yet" screen. The database enforces all of
+this (row-level security), not just the UI. The publishable key in `config.js` is meant to be public;
+never put the secret / service_role key there.
 
-## 3. Host it
-Any static host works: Cloudflare Pages, Netlify, GitHub Pages, or IIS / Kestrel static files.
-Upload `dist/index.html` and `dist/config.js` to the same folder. HTTPS is required for sign-in.
+## 3. Host it — GitHub Pages (automatic)
+`.github/workflows/pages.yml` builds the app and publishes `dist/` on every push to `main`.
+One-time: GitHub repo → **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+The site is then at `https://<user>.github.io/<repo>/`. (Pages on a private repo needs a paid GitHub plan;
+the repo contains code and the public key only — no data.)
+
+Any other static host also works (upload `dist/`). HTTPS is required for sign-in.
 
 ## Deploy to Cloudflare Pages (free, works on mobile)
 One-time: create a free account at dash.cloudflare.com.
@@ -80,10 +92,10 @@ Notes
 - **Other device:** in the old version use *Backup JSON*, then *Restore JSON* in the new one.
   Old backup formats are converted.
 
-## Privacy (decide before sharing the link)
-Cloud mode makes **all** formulations, supplier rates, costs and margins readable by anyone who
-has the link and the anon key (which is inside `config.js`). If that is not acceptable, change the
-`public read` policies in the SQL to `to authenticated` and give viewers accounts.
+## Privacy
+With `requireSignIn: true` and the v7 SQL, nothing is readable without signing in as a listed member
+(`forvet_admins` or `forvet_viewers`). Signing out clears this browser's cached copy of the cloud data
+(unless there are unsent changes).
 
 ## Backups & recovery
 - ⋯ → *Download backup* downloads everything. Restore asks for confirmation and offers a backup first.

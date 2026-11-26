@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" />
   <!-- Optional deployment config (Supabase URL + anon key). Missing file = local-only mode. -->
   <script src="config.js"></script>
+  <!-- Private mode: hide the app until the sign-in check has run (avoids a flash of cached data). -->
+  <script>try { var c = window.FORVET_CONFIG || {}; if (c.requireSignIn && c.supabaseUrl && c.supabaseAnonKey) document.documentElement.classList.add('gate-on'); } catch (e) {}</script>
   <style>
 /*__TAILWIND__*/
   </style>
@@ -19,6 +21,9 @@
     body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background-color: #f6f7f9; color: #1f2430; }
     .mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     [hidden] { display: none !important; }
+    html.gate-on body > :not(#signInGate):not(#uiDialog):not(#toast):not(script) { display: none !important; }
+    html.gate-on #signInGate { display: flex !important; }
+    html.gate-on body { overflow: hidden; }
     :focus-visible { outline: 2px solid #3d65ef; outline-offset: 2px; }
     button:disabled, input:disabled, select:disabled, textarea:disabled { cursor: not-allowed; }
     .ro-lock input:disabled, .ro-lock select:disabled, .ro-lock textarea:disabled { background-color: #f8fafc; color: #334155; opacity: 1; }

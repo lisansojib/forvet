@@ -1,6 +1,6 @@
 # Sign-in — design & implementation plan
 
-Status: **proposal** (header/footer redesign is done; this is the next step).
+Status: **partly built** (Nov 2026). Done: private mode (§6) full-page sign-in with forgot/reset password, no-access screen, account menu with sign out, member-only database reads. Not yet: the §3 restyle of the optional sign-in *modal* used when `requireSignIn` is off, resuming a pending action after sign-in.
 
 ## 1. Context
 

@@ -1,11 +1,13 @@
 -- =====================================================================
--- Forvet — Supabase schema (v6)
+-- Forvet — Supabase schema (v7: private read)
 -- Run once in Supabase Dashboard → SQL Editor → New query → Run.
 -- Safe to re-run: every statement is idempotent.
 --
 -- Security model
---   * Anyone (anon key, not signed in) can READ formulations, materials
---     and settings. This is the "public view" the owner asked for.
+--   * PRIVATE: only signed-in MEMBERS can read. A member is a user listed in
+--     public.forvet_admins (can edit) or public.forvet_viewers (read only).
+--     Being signed in is not enough, so a stray sign-up cannot read data.
+--     The anon key alone (it is public, inside config.js) reads nothing.
 --   * Only users listed in public.forvet_admins can INSERT/UPDATE/DELETE.
 --     There is no client-side path to become an admin.
 --   * Every update/delete keeps the previous row in forvet_revisions
@@ -21,6 +23,12 @@ create table if not exists public.forvet_admins (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.forvet_viewers (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  note       text,
+  created_at timestamptz not null default now()
+);
+
 create or replace function public.is_forvet_admin()
 returns boolean
 language sql
@@ -29,6 +37,17 @@ security definer
 set search_path = public
 as $$
   select exists (select 1 from public.forvet_admins a where a.user_id = auth.uid());
+$$;
+
+create or replace function public.is_forvet_member()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.forvet_admins  a where a.user_id = auth.uid())
+      or exists (select 1 from public.forvet_viewers v where v.user_id = auth.uid());
 $$;
 
 -- ---------- Entity tables (one jsonb document per record) ----------
@@ -115,6 +134,7 @@ end $$;
 
 -- ---------- Row Level Security ----------
 alter table public.forvet_admins       enable row level security;
+alter table public.forvet_viewers      enable row level security;
 alter table public.forvet_ingredients  enable row level security;
 alter table public.forvet_formulations enable row level security;
 alter table public.forvet_settings     enable row level security;
@@ -124,8 +144,9 @@ do $$
 declare t text;
 begin
   foreach t in array array['forvet_ingredients','forvet_formulations','forvet_settings'] loop
-    execute format('drop policy if exists "public read" on public.%I', t);
-    execute format('create policy "public read" on public.%I for select to anon, authenticated using (true)', t);
+    execute format('drop policy if exists "public read" on public.%I', t);   -- v6 policy, removed
+    execute format('drop policy if exists "member read" on public.%I', t);
+    execute format('create policy "member read" on public.%I for select to authenticated using (public.is_forvet_member())', t);
     execute format('drop policy if exists "admin insert" on public.%I', t);
     execute format('create policy "admin insert" on public.%I for insert to authenticated with check (public.is_forvet_admin())', t);
     execute format('drop policy if exists "admin update" on public.%I', t);
@@ -139,6 +160,10 @@ drop policy if exists "read own admin row" on public.forvet_admins;
 create policy "read own admin row" on public.forvet_admins
   for select to authenticated using (user_id = auth.uid());
 
+drop policy if exists "read own viewer row" on public.forvet_viewers;
+create policy "read own viewer row" on public.forvet_viewers
+  for select to authenticated using (user_id = auth.uid());
+
 drop policy if exists "admins read revisions" on public.forvet_revisions;
 create policy "admins read revisions" on public.forvet_revisions
   for select to authenticated using (public.is_forvet_admin());
@@ -146,14 +171,19 @@ create policy "admins read revisions" on public.forvet_revisions
 -- ---------- Grants (RLS still applies on top of these) ----------
 revoke all on public.forvet_admins    from anon, authenticated;
 revoke all on public.forvet_revisions from anon, authenticated;
+revoke all on public.forvet_viewers   from anon, authenticated;
 grant select on public.forvet_admins    to authenticated;
+grant select on public.forvet_viewers   to authenticated;
 grant select on public.forvet_revisions to authenticated;
 
-grant select on public.forvet_ingredients, public.forvet_formulations, public.forvet_settings to anon, authenticated;
+revoke all on public.forvet_ingredients, public.forvet_formulations, public.forvet_settings from anon;
+grant select on public.forvet_ingredients, public.forvet_formulations, public.forvet_settings to authenticated;
 grant insert, update, delete on public.forvet_ingredients, public.forvet_formulations, public.forvet_settings to authenticated;
 
 revoke all on function public.is_forvet_admin() from public;
-grant execute on function public.is_forvet_admin() to anon, authenticated;
+revoke all on function public.is_forvet_member() from public;
+grant execute on function public.is_forvet_admin()  to authenticated;
+grant execute on function public.is_forvet_member() to authenticated;
 
 -- =====================================================================
 -- AFTER RUNNING: make yourself an administrator
@@ -163,6 +193,13 @@ grant execute on function public.is_forvet_admin() to anon, authenticated;
 --   insert into public.forvet_admins (user_id, note)
 --   select id, 'owner' from auth.users where email = 'you@example.com'
 --   on conflict do nothing;
+--
+-- Give someone READ-ONLY access (create their user first, step 1):
+--   insert into public.forvet_viewers (user_id, note)
+--   select id, 'viewer' from auth.users where email = 'person@example.com'
+--   on conflict do nothing;
+--
+-- ALSO: Authentication → Sign In / Providers → turn OFF "Allow new users to sign up".
 --
 -- To remove an admin:
 --   delete from public.forvet_admins

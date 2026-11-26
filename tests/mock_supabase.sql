@@ -11,4 +11,4 @@ create or replace function auth.uid() returns uuid language sql stable as $$
 grant usage on schema auth to anon, authenticated;
 grant execute on function auth.uid() to anon, authenticated;
 grant usage on schema public to anon, authenticated;
-insert into auth.users values ('11111111-1111-1111-1111-111111111111','admin@forvet.test'),('22222222-2222-2222-2222-222222222222','viewer@forvet.test');
+insert into auth.users values ('11111111-1111-1111-1111-111111111111','admin@forvet.test'),('22222222-2222-2222-2222-222222222222','viewer@forvet.test'),('33333333-3333-3333-3333-333333333333','stranger@forvet.test');

@@ -12,7 +12,7 @@ const LS_OUTBOX = 'FORVET_OUTBOX_V6';
 const LS_UI = 'FORVET_UI_V6';
 const LS_STASH = 'FORVET_LOCAL_STASH_V6';
 const LS_LEGACY = 'FORMUVET_AZ_SHOHAN_ERP_V1';
-const CFG = Object.assign({ supabaseUrl: '', supabaseAnonKey: '', allowSignup: false }, window.FORVET_CONFIG || {});
+const CFG = Object.assign({ supabaseUrl: '', supabaseAnonKey: '', allowSignup: false, requireSignIn: false }, window.FORVET_CONFIG || {});
 const SUPABASE_JS_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js';
 const TESSERACT_JS_URL = 'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.min.js';
 const CARRIER_ROLE = 'Carrier / Base';
@@ -313,6 +313,7 @@ function sortedIngredients(includeArchived = false) { return Object.values(S.ing
 
 /* ---------------- persistence (browser) ---------------- */
 function persistLocalNow() {
+  if (window.__forvetNoPersist) return; // signing out in private mode: don't write the cloud copy back
   try {
     localStorage.setItem(LS_DATA, JSON.stringify({ schema: APP_SCHEMA, savedAt: nowIso(), ingredients: S.ingredients, formulations: S.formulations, settings: S.settings, meta: META }));
     localStorage.setItem(LS_OUTBOX, JSON.stringify([...outbox.values()]));
@@ -379,7 +380,7 @@ function markDirty(kind, id, opts = {}) {
    CLOUD (Supabase) — public read, admin write, optimistic concurrency
    ===================================================================== */
 const TABLES = { ingredient: 'forvet_ingredients', formulation: 'forvet_formulations', settings: 'forvet_settings' };
-const CLOUD = { client: null, configured: false, ready: false, user: null, isAdmin: false, online: navigator.onLine, flushing: false, lastPull: 0, error: '', retryMs: 4000, retryTimer: null, emptyCloud: false };
+const CLOUD = { client: null, configured: false, ready: false, user: null, isAdmin: false, isMember: false, recovery: false, online: navigator.onLine, flushing: false, lastPull: 0, error: '', retryMs: 4000, retryTimer: null, emptyCloud: false };
 function isCloudMode() { return CLOUD.configured; }
 function canEdit() { return !isCloudMode() || CLOUD.isAdmin; }
 
@@ -406,6 +407,7 @@ async function initCloud() {
     outbox.clear();
   }
   updateStatusBadges();
+  if (CFG.requireSignIn) showGate('gateChecking');
   try {
     if (!window.supabase?.createClient) await loadScript(window.FORVET_SUPABASE_JS_URL || SUPABASE_JS_URL);
     CLOUD.client = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'forvet-auth' } });
@@ -415,12 +417,20 @@ async function initCloud() {
     CLOUD.client.auth.onAuthStateChange((event, session) => {
       const prev = CLOUD.user?.id || null;
       CLOUD.user = session?.user || null;
+      if (event === 'PASSWORD_RECOVERY') { CLOUD.recovery = true; setTimeout(() => showGate('gateNewPw'), 0); return; }
+      if (event === 'SIGNED_OUT' && CFG.requireSignIn) { setTimeout(() => onSignedOutPrivate(), 0); return; }
       if ((CLOUD.user?.id || null) !== prev || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         setTimeout(async () => { await refreshAdmin(); await pullAll(); renderAll(); if (CLOUD.isAdmin) flushOutbox(); }, 0);
       }
     });
+    if (CFG.requireSignIn && !CLOUD.user) {
+      // Private mode, nobody signed in: don't read anything, just ask for credentials.
+      CLOUD.ready = true; updateStatusBadges(); if (!CLOUD.recovery) showGate('gateSignIn'); return;
+    }
+    if (CFG.requireSignIn && !CLOUD.isMember) { CLOUD.ready = true; updateStatusBadges(); showGate('gateNoAccess'); return; }
     await pullAll({ first: true });
     CLOUD.ready = true;
+    if (CFG.requireSignIn && !CLOUD.recovery) hideGate();
     META.cloudUrl = CFG.supabaseUrl;
     persistLocalNow();
     renderAll();
@@ -431,21 +441,32 @@ async function initCloud() {
     CLOUD.online = navigator.onLine;
     if (UI.adminUserId && CLOUD.user && UI.adminUserId === CLOUD.user.id) CLOUD.isAdmin = true; // cached admin, offline editing allowed
     renderAll();
+    if (CFG.requireSignIn) {
+      // Offline with a remembered session → keep working on the cached copy. Otherwise ask to sign in.
+      if (CLOUD.user) hideGate(); else { showGate('gateSignIn'); gateMsg('gateError', `Can't reach the server right now. ${CLOUD.error || 'Check your connection and try again.'}`); }
+    }
   }
   updateStatusBadges();
 }
 
 async function refreshAdmin() {
-  CLOUD.isAdmin = false;
+  CLOUD.isAdmin = false; CLOUD.isMember = false;
   if (!CLOUD.client || !CLOUD.user) { UI.adminUserId = null; saveUI(); return; }
   try {
     const { data, error } = await CLOUD.client.rpc('is_forvet_admin');
     if (error) throw error;
     CLOUD.isAdmin = data === true;
+    CLOUD.isMember = CLOUD.isAdmin;
+    if (!CLOUD.isAdmin && CFG.requireSignIn) {
+      const m = await CLOUD.client.rpc('is_forvet_member');
+      if (m.error) throw m.error;
+      CLOUD.isMember = m.data === true;
+    }
     UI.adminUserId = CLOUD.isAdmin ? CLOUD.user.id : null; saveUI();
   } catch (err) {
     console.warn('Admin check failed', err);
     if (UI.adminUserId === CLOUD.user.id) CLOUD.isAdmin = true; // offline: trust cached role; the database still enforces RLS on upload
+    CLOUD.isMember = true; // couldn't check (offline): show the cached copy; the server still only returns rows to members
   }
 }
 
@@ -542,7 +563,7 @@ async function offerCloudSeed() {
   if (CLOUD.seedPrompted) return;
   CLOUD.seedPrompted = true;
   const nf = Object.keys(S.formulations).length, ni = Object.keys(S.ingredients).length;
-  const ok = await uiConfirm('Cloud database is empty', `Upload this browser's data to the cloud? (${nf} formulations, ${ni} materials, settings). Everyone with the link will then see it.`, 'Upload to cloud');
+  const ok = await uiConfirm('Cloud database is empty', `Upload this browser's data to the cloud? (${nf} formulations, ${ni} materials, settings). Everyone with ${CFG.requireSignIn ? 'access to Forvet' : 'the link'} will then see it.\n\nIf this browser only has the sample data, choose Cancel and use ⋯ → Restore from backup with your JSON backup instead.`, 'Upload to cloud');
   if (!ok) { showBanner('seed', 'info', 'The cloud is still empty. Your first edit will upload all current data.'); return; }
   for (const id of Object.keys(S.ingredients)) outbox.set(`ingredient:${id}`, { kind: 'ingredient', id, seq: ++editSeq });
   for (const id of Object.keys(S.formulations)) outbox.set(`formulation:${id}`, { kind: 'formulation', id, seq: ++editSeq });
@@ -680,6 +701,10 @@ function updateStatusBadges() {
   const ab = $('authButton');
   if (ab) {
     ab.hidden = !isCloudMode();
+    // Signed in → the button opens the account menu; signed out → it opens sign-in.
+    if (CLOUD.user) { ab.removeAttribute('data-act'); ab.setAttribute('data-menu-toggle', ''); ab.setAttribute('aria-haspopup', 'menu'); }
+    else { ab.setAttribute('data-act', 'open-auth'); ab.removeAttribute('data-menu-toggle'); ab.removeAttribute('aria-haspopup'); }
+    if ($('accountEmail')) { $('accountEmail').textContent = CLOUD.user?.email || ''; $('accountRole').textContent = CLOUD.isAdmin ? 'Administrator · can edit' : 'Viewer · read only'; }
     if (CLOUD.user) {
       const email = CLOUD.user.email || '';
       const initials = (email.split('@')[0].split(/[._-]+/).filter(Boolean).slice(0, 2).map(x => x[0]).join('') || '?').toUpperCase();

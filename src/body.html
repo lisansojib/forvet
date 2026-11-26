@@ -34,7 +34,18 @@
       </nav>
       <div class="ml-auto flex items-center gap-2">
         <button type="button" id="cloudStatusBadge" data-act="open-sync" class="cloud-state" title="Storage and sync status">Starting…</button>
-        <button type="button" id="authButton" data-act="open-auth" class="btn btn-secondary">Sign in</button>
+        <div class="menu" data-menu id="accountMenu">
+          <button type="button" id="authButton" data-act="open-auth" class="btn btn-secondary" aria-expanded="false">Sign in</button>
+          <div class="menu-pop" role="menu" hidden>
+            <div class="px-3 pt-1.5 pb-2">
+              <div id="accountEmail" class="text-[13px] font-medium text-ink-900 truncate"></div>
+              <div id="accountRole" class="text-[11px] text-ink-500 mt-0.5"></div>
+            </div>
+            <div class="menu-sep"></div>
+            <button type="button" role="menuitem" data-act="open-sync" class="menu-item">Sync &amp; storage</button>
+            <button type="button" role="menuitem" data-act="sign-out" class="menu-item">Sign out</button>
+          </div>
+        </div>
       </div>
     </div>
 

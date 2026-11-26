@@ -508,7 +508,9 @@ async function signUp() {
 }
 async function signOut() {
   if (outbox.size && !(await uiConfirm('Unsent changes', `${outbox.size} change(s) have not reached the cloud yet. They stay in this browser and upload when an administrator signs in here again. Sign out anyway?`, 'Sign out'))) return;
+  if (CFG.requireSignIn) { SIGNING_OUT.keepLocal = outbox.size > 0; SIGNING_OUT.active = true; }
   await CLOUD.client?.auth.signOut();
+  if (CFG.requireSignIn) { onSignedOutPrivate(); return; }
   CLOUD.user = null; CLOUD.isAdmin = false; UI.adminUserId = null; saveUI(); renderAll(); renderAuthModal(); toast('Signed out.');
 }
 function stashData() { try { return JSON.parse(localStorage.getItem(LS_STASH) || 'null'); } catch (_) { return null; } }
@@ -575,7 +577,8 @@ async function handleAction(btn) {
     case 'open-materials': openMaterials(); break;
     case 'close-materials': closeMaterials(); break;
     case 'open-myforms': closeModal('moreSheet'); openModal('myFormulationsModal'); renderMyFormulations(); break;
-    case 'open-auth': renderAuthModal(); openModal('authModal'); break;
+    case 'open-auth': if (CFG.requireSignIn && !CLOUD.user) { closeModal('moreSheet'); showGate('gateSignIn'); } else { renderAuthModal(); openModal('authModal'); } break;
+    case 'sign-out': closeModal('moreSheet'); signOut(); break;
     case 'open-sync': renderSyncModal(); openModal('syncModal'); break;
     case 'open-more': openModal('moreSheet'); applyPermissions(); break;
     case 'create': if (requireEdit('create formulations')) { closeModal('moreSheet'); $('createProdName').value = ''; openModal('createModal'); } break;
@@ -711,7 +714,7 @@ async function boot() {
   if (!S.settings) S.settings = sanitizeSettings({});
   for (const i of Object.values(S.ingredients)) for (const c of i.categories) if (!S.settings.categories.includes(c)) S.settings.categories.push(c);
   ensureCurrentValid();
-  wireEvents(); initCollapsibles(); initEnterNavigation(); initBackToTop();
+  wireEvents(); wireGate(); initCollapsibles(); initEnterNavigation(); initBackToTop();
   renderAll();
   persistLocalNow(); updateStatusBadges();
   if (source === 'legacy') toast('Your data from the previous Forvet version was imported. The old copy is kept untouched in this browser.');
